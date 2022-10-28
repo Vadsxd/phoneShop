@@ -1,6 +1,8 @@
 alter table if exists subcategory drop constraint if exists fk_product_id;
 alter table if exists category drop constraint if exists fk_subcategory_id;
 alter table if exists refresh_token drop constraint if exists fk_user_id;
+alter table if exists subcategory drop constraint if exists fk_category_id;
+alter table if exists product drop constraint if exists fk_subcategory_id;
 
 drop table if exists "user" cascade;
 drop table if exists category cascade;
@@ -54,8 +56,10 @@ create table refresh_token
 );
 
 
+alter table if exists subcategory add constraint fk_category_id foreign key (category_id) references category;
+alter table if exists category add constraint fk_subcategory_id foreign key (subcategory_id) references subcategory;
 alter table if exists subcategory add constraint fk_product_id foreign key (product_id) references product;
-alter table if exists category add constraint fk_category_id foreign key (subcategory_id) references subcategory;
+alter table if exists product add constraint fk_subcategory_id foreign key (subcategory_id) references subcategory;
 alter table refresh_token add constraint fk_user_id foreign key (user_id) references "user";
 
 

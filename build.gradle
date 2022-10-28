@@ -19,15 +19,38 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.4'
-    implementation 'org.postgresql:postgresql:42.5.0'
-    implementation 'org.flywaydb:flyway-core:9.4.0'
 
+    // Mapping
+    implementation 'org.modelmapper:modelmapper:3.1.0'
+
+    // Web
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.0'
+
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.7.5'
+    compileOnly 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.5'
+
+    // Database
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.5'
+    implementation 'org.postgresql:postgresql:42.5.0'
+    implementation 'org.flywaydb:flyway-core:9.5.1'
+
+    // Swagger
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+    // Development
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
