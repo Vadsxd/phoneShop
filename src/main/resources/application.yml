@@ -12,14 +12,27 @@ spring:
     properties:
       hibernate:
         dialect: 'org.hibernate.dialect.PostgreSQLDialect'
+
   datasource:
     url: 'jdbc:postgresql://localhost:5432/postgres'
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
   flyway:
     baseline-on-migrate: true
     locations: 'classpath:db.migration'
     schemas: 'public'
     enabled: true
 
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
+shop:
+  jwt:
+    secret:
+      access: ${JWT_ACCESS_SECRET}
+      refresh: ${JWT_REFRESH_SECRET}
+    expires:
+      access-sec: 300
+      refresh-days: 30
