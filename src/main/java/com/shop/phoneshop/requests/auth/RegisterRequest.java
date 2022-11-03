@@ -9,7 +9,13 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AuthRequest {
+public class RegisterRequest {
+    @NotBlank
+    private String firstName;
+
+    @NotBlank
+    private String lastName;
+
     @NotBlank
     private String userEmail;
 

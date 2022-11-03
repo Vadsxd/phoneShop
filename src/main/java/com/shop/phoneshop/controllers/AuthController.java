@@ -1,8 +1,10 @@
 package com.shop.phoneshop.controllers;
 
+import com.shop.phoneshop.domain.User;
 import com.shop.phoneshop.dto.JwtResponseDto;
 import com.shop.phoneshop.requests.auth.AuthRequest;
 import com.shop.phoneshop.requests.auth.RefreshTokenRequest;
+import com.shop.phoneshop.requests.auth.RegisterRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,11 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<User> login(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.registerUser(request));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.authenticateUser(request));
@@ -31,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponseDto> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authService.refreshToken(request));
+        return ResponseEntity.ok(authService.refreshTokens(request));
     }
 
     @PostMapping("/logout")
