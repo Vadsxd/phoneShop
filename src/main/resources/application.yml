@@ -28,11 +28,17 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+springfox:
+  documentation:
+    swagger:
+      v2:
+        use-model-v3: false
+
 shop:
   jwt:
     secret:
       access: ${JWT_ACCESS_SECRET}
       refresh: ${JWT_REFRESH_SECRET}
     expires:
-      access-sec: 300
+      access-sec: 604800
       refresh-days: 30
