@@ -1,6 +1,5 @@
 package com.shop.phoneshop.domain;
 
-import com.shop.phoneshop.domain.enums.ProductStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,16 +27,19 @@ public class Product {
     @JoinColumn(name = "subcategory_id")
     private Subcategory subcategory;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private ProductStatus status;
+    @Column(name = "amount")
+    private Long amount;
 
     @Column(name = "price")
     private Long price;
+
+    @Column(name = "discount_price")
+    private Long discountPrice;
 
     @Column(name = "picture_url")
     private String pictureUrl;
 
     @Column(name = "discount")
     private Boolean discount;
+
 }
