@@ -6,7 +6,7 @@ import com.shop.phoneshop.security.jwt.JwtAuthentication;
 
 public interface ProductUtil {
     static Long getPrice(Product product, JwtAuthentication authentication) {
-        if (authentication.isAuthenticated() && !product.getDiscount()) {
+        if (authentication.isAuthenticated() && product.getDiscount()) {
             return product.getDiscountPrice();
         }
         return product.getPrice();

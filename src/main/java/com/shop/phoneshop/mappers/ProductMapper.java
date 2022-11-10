@@ -1,6 +1,5 @@
 package com.shop.phoneshop.mappers;
 
-import com.shop.phoneshop.domain.Category;
 import com.shop.phoneshop.domain.Product;
 import com.shop.phoneshop.dto.ProductDto;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
