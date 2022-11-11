@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -42,4 +44,6 @@ public class Product {
     @Column(name = "discount")
     private Boolean discount;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<UserProduct> userProducts = new ArrayList<>();
 }
