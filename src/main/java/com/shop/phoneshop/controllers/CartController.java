@@ -1,16 +1,17 @@
 package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.dto.CartDto;
+import com.shop.phoneshop.requests.AddProductRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api")
 public class CartController {
     private final CartService cartService;
 
@@ -19,8 +20,16 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @GetMapping("/userProducts")
+    @GetMapping("/cart")
     ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication) {
         return ResponseEntity.ok(cartService.getUserProducts(authentication));
+    }
+
+    @PostMapping("/addProduct")
+    public void addProduct(
+            @Valid @RequestBody AddProductRequest request,
+            JwtAuthentication authentication
+            ) {
+        cartService.addProduct(request, authentication);
     }
 }
