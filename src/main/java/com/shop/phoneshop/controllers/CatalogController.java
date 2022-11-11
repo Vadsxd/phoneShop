@@ -21,8 +21,18 @@ public class CatalogController {
         this.catalogService = catalogService;
     }
 
+    @GetMapping("/products")
+    ResponseEntity<List<ProductDto>> getAllProducts(JwtAuthentication authentication) {
+        return ResponseEntity.ok(catalogService.getAllProducts(authentication));
+    }
+
     @GetMapping("/smartphones")
     ResponseEntity<List<ProductDto>> getSmartphones(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllSmartphones(authentication));
+        return ResponseEntity.ok(catalogService.getAllProductsFromCategory("Smartphones",authentication));
+    }
+
+    @GetMapping("/audioTech")
+    ResponseEntity<List<ProductDto>> getAudioTechnics(JwtAuthentication authentication) {
+        return ResponseEntity.ok(catalogService.getAllProductsFromCategory("AudioTechnics", authentication));
     }
 }
