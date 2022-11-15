@@ -2,6 +2,7 @@ package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.dto.CartDto;
 import com.shop.phoneshop.requests.AddProductRequest;
+import com.shop.phoneshop.requests.CartProductRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,5 +32,15 @@ public class CartController {
             JwtAuthentication authentication
             ) {
         cartService.addProduct(request, authentication);
+    }
+
+    @PostMapping("/cart/addAmount")
+    public void addAmount(@Valid @RequestBody CartProductRequest request) {
+        cartService.addAmount(request);
+    }
+
+    @PostMapping("/cart/reduceAmount")
+    public void reduceAmount(@Valid @RequestBody CartProductRequest request) {
+        cartService.reduceAmount(request);
     }
 }

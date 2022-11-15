@@ -11,9 +11,12 @@ import com.shop.phoneshop.repos.ProductRepo;
 import com.shop.phoneshop.repos.UserProductRepo;
 import com.shop.phoneshop.repos.UserRepo;
 import com.shop.phoneshop.requests.AddProductRequest;
+import com.shop.phoneshop.requests.CartProductRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,12 +34,43 @@ public class CartService {
 
     public CartDto getUserProducts(JwtAuthentication authentication) {
         User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new RuntimeException("Пользователь не найден"));
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
         List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
         List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts);
 
         return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
+    }
+
+    @Transactional
+    public void reduceAmount(CartProductRequest request) {
+        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+
+        Long amount = userProduct.getAmount();
+
+        if (amount - 1 == 0) {
+            userProductRepo.delete(userProduct);
+        } else {
+            userProduct.setAmount(amount - 1);
+            userProductRepo.save(userProduct);
+        }
+    }
+
+    @Transactional
+    public void addAmount(CartProductRequest request) {
+        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+
+        Product product = userProduct.getProduct();
+        Long amount = userProduct.getAmount();
+
+        if (product.getAmount() < amount + 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+        } else {
+            userProduct.setAmount(amount + 1);
+            userProductRepo.save(userProduct);
+        }
     }
 
     @Transactional
@@ -50,6 +84,7 @@ public class CartService {
         UserProduct userProduct = new UserProduct();
         userProduct.setUser(user);
         userProduct.setProduct(product);
+        userProduct.setAmount(1L);
         userProductRepo.save(userProduct);
     }
 }

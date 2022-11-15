@@ -4,6 +4,7 @@ import com.shop.phoneshop.dto.CartDto;
 import com.shop.phoneshop.dto.UserProductDto;
 
 import java.util.List;
+import java.util.stream.LongStream;
 
 public interface CartMapper {
     static CartDto fromUserProductDtosToCartDto(List<UserProductDto> userProductDtos) {
@@ -11,7 +12,7 @@ public interface CartMapper {
         cartDto.setUserProductDtos(userProductDtos);
         cartDto.setCount((long) userProductDtos.size());
         cartDto.setFullPrice(userProductDtos.stream()
-                .mapToLong(UserProductDto::getPrice)
+                .flatMapToLong(p -> LongStream.of(p.getPrice() * p.getAmount()))
                 .sum());
 
         return cartDto;

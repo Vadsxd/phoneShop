@@ -11,4 +11,5 @@ public class UserProductDto {
     private String pictureUrl;
     private String title;
     private Long price;
+    private Long amount;
 }

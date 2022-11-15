@@ -27,4 +27,6 @@ public class UserProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @Column(name = "amount")
+    private Long amount;
 }
