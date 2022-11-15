@@ -41,7 +41,8 @@ public class CatalogService {
     }
 
     public List<ProductDto> getAllProductsFromCategory(String title, JwtAuthentication authentication) {
-        Category category = categoryRepo.findByTitle(title);
+        Category category = categoryRepo.findByTitle(title).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной категории не найдены"));
         List<Product> products = category.getSubcategories().stream()
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
@@ -49,14 +50,19 @@ public class CatalogService {
     }
 
     public List<ProductDto> getAllProductsFromSubcategory(String title, JwtAuthentication authentication) {
-        Subcategory subcategory = subcategoryRepo.findByTitle(title);
+        Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
         return ProductMapper.fromProductsToDtos(products, authentication);
     }
 
     public List<ProductDto> getSmartphonesExtraProducts(JwtAuthentication authentication) {
-        List<Product> headphones  = subcategoryRepo.findByTitle("Headphones").getProducts();
-        List<Product> covers = subcategoryRepo.findByTitle("SmartphoneCovers").getProducts();
+        List<Product> headphones = subcategoryRepo.findByTitle("Headphones").orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
+                .getProducts();
+        List<Product> covers = subcategoryRepo.findByTitle("SmartphoneCovers").orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
+                .getProducts();
         List<Product> products = new ArrayList<>(headphones);
         products.addAll(covers);
         return ProductMapper.fromProductsToDtos(products, authentication);
