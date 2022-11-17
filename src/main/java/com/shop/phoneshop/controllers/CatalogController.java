@@ -66,4 +66,5 @@ public class CatalogController {
     ResponseEntity<List<ProductDto>> getSmartphonesExtraProducts(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getSmartphonesExtraProducts(authentication));
     }
+
 }

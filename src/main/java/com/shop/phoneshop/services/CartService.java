@@ -87,4 +87,15 @@ public class CartService {
         userProduct.setAmount(1L);
         userProductRepo.save(userProduct);
     }
+
+    @Transactional
+    public void deleteProduct(CartProductRequest request, JwtAuthentication authentication) {
+        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                new RuntimeException("Пользователь не найден"));
+
+        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
+                new RuntimeException("Товар в корзине не найден"));
+
+        userProductRepo.delete(userProduct);
+    }
 }
