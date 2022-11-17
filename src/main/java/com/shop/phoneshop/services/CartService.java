@@ -90,8 +90,6 @@ public class CartService {
 
     @Transactional
     public void deleteProduct(CartProductRequest request, JwtAuthentication authentication) {
-        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new RuntimeException("Пользователь не найден"));
 
         UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
                 new RuntimeException("Товар в корзине не найден"));
