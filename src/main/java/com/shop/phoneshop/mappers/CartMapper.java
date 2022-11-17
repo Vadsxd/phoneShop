@@ -10,7 +10,9 @@ public interface CartMapper {
     static CartDto fromUserProductDtosToCartDto(List<UserProductDto> userProductDtos) {
         CartDto cartDto = new CartDto();
         cartDto.setUserProductDtos(userProductDtos);
-        cartDto.setCount((long) userProductDtos.size());
+        cartDto.setCount(userProductDtos.stream()
+                .flatMapToLong(a -> LongStream.of(a.getAmount()))
+                .sum());
         cartDto.setFullPrice(userProductDtos.stream()
                 .flatMapToLong(p -> LongStream.of(p.getPrice() * p.getAmount()))
                 .sum());
