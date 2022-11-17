@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -22,8 +23,8 @@ public class CartController {
     }
 
     @GetMapping("/cart")
-    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication) {
-        return ResponseEntity.ok(cartService.getUserProducts(authentication));
+    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication, HttpServletRequest httpServletRequest) {
+        return ResponseEntity.ok(cartService.getUserProducts(authentication, httpServletRequest));
     }
 
     @PostMapping("/addProduct")

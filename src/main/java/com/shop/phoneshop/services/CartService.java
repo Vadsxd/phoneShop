@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
@@ -25,21 +27,32 @@ public class CartService {
     private final UserProductRepo userProductRepo;
     private final UserRepo userRepo;
     private final ProductRepo productRepo;
+    private final CookieService cookieService;
 
-    public CartService(UserProductRepo userProductRepo, UserRepo userRepo, ProductRepo productRepo) {
+    public CartService(UserProductRepo userProductRepo,
+                       UserRepo userRepo,
+                       ProductRepo productRepo,
+                       CookieService cookieService
+                       ) {
         this.userProductRepo = userProductRepo;
         this.userRepo = userRepo;
         this.productRepo = productRepo;
+        this.cookieService = cookieService;
     }
 
-    public CartDto getUserProducts(JwtAuthentication authentication) {
-        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+    public CartDto getUserProducts(JwtAuthentication authentication, HttpServletRequest httpServletRequest) {
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
-        List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts);
+            List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
+            List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts);
 
-        return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
+            return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
+        } else {
+            Cookie[] cookies = cookieService.getCookie(httpServletRequest);
+            
+        }
     }
 
     @Transactional
@@ -75,16 +88,21 @@ public class CartService {
 
     @Transactional
     public void addProduct(AddProductRequest request, JwtAuthentication authentication) {
-        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new RuntimeException("Пользователь не найден"));
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new RuntimeException("Пользователь не найден"));
 
-        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                new RuntimeException("Товар не найден"));
+            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                    new RuntimeException("Товар не найден"));
 
-        UserProduct userProduct = new UserProduct();
-        userProduct.setUser(user);
-        userProduct.setProduct(product);
-        userProduct.setAmount(1L);
-        userProductRepo.save(userProduct);
+            UserProduct userProduct = new UserProduct();
+            userProduct.setUser(user);
+            userProduct.setProduct(product);
+            userProduct.setAmount(1L);
+            userProductRepo.save(userProduct);
+        } else {
+            //TODO сделать куки
+            cookieService.setCookie("product", request.getProductId().toString());
+        }
     }
 }
