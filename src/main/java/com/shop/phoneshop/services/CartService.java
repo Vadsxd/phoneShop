@@ -21,7 +21,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -35,7 +40,7 @@ public class CartService {
                        UserRepo userRepo,
                        ProductRepo productRepo,
                        CookieService cookieService
-                       ) {
+    ) {
         this.userProductRepo = userProductRepo;
         this.userRepo = userRepo;
         this.productRepo = productRepo;
@@ -53,6 +58,22 @@ public class CartService {
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
             Cookie[] cookies = cookieService.getCookie(httpServletRequest);
+            if (cookies == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "В корзине нет товаров");
+            }
+            List<UserProductDto> userProductDtos = new ArrayList<>();
+            List<String> values = Arrays.stream(cookies)
+                    .map(Cookie::getValue).toList();
+            for (int i = 0; i < values.size(); i += 4) {
+                UserProductDto dto = new UserProductDto();
+                dto.setPictureUrl(URLDecoder.decode(values.get(i), StandardCharsets.UTF_8));
+                dto.setTitle(URLDecoder.decode(values.get(i + 1), StandardCharsets.UTF_8));
+                dto.setPrice(Long.parseLong(URLDecoder.decode(values.get(i + 2), StandardCharsets.UTF_8)));
+                dto.setAmount(Long.parseLong(URLDecoder.decode(values.get(i + 3), StandardCharsets.UTF_8)));
+                userProductDtos.add(dto);
+            }
+
+            return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         }
     }
 
@@ -106,8 +127,14 @@ public class CartService {
             userProduct.setAmount(1L);
             userProductRepo.save(userProduct);
         } else {
-            //TODO сделать куки
-            cookieService.setCookie("product", request.getProductId().toString());
+            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+            Long productId = product.getId();
+            cookieService.setCookie("pictureUrl" + productId, product.getPictureUrl());
+            cookieService.setCookie("title" + productId, product.getTitle());
+            cookieService.setCookie("price" + productId, String.valueOf(product.getPrice()));
+            cookieService.setCookie("amount" + productId, String.valueOf(1L));
         }
     }
 }
