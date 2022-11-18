@@ -9,6 +9,7 @@ import com.shop.phoneshop.repos.CategoryRepo;
 import com.shop.phoneshop.repos.ProductRepo;
 import com.shop.phoneshop.repos.SubcategoryRepo;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +24,7 @@ public class CatalogService {
     private final ProductRepo productRepo;
     private final SubcategoryRepo subcategoryRepo;
 
+    @Autowired
     public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo, SubcategoryRepo subcategoryRepo) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
