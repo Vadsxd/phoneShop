@@ -29,6 +29,12 @@ public class CookieService {
         httpServletResponse.addCookie(cookie);
     }
 
+    public void deleteCookie(String name) {
+        Cookie cookie = new Cookie(name, null);
+        cookie.setMaxAge(0);
+        httpServletResponse.addCookie(cookie);
+    }
+
     public Cookie[] getCookie(HttpServletRequest httpServletRequest) {
         return httpServletRequest.getCookies();
     }

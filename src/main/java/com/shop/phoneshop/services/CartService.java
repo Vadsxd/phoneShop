@@ -78,8 +78,14 @@ public class CartService {
     }
 
     @Transactional
-    public void reduceAmount(CartProductRequest request) {
-        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
+    public void reduceAmount(CartProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+        UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
 
         Long amount = userProduct.getAmount();
@@ -93,11 +99,16 @@ public class CartService {
     }
 
     @Transactional
-    public void addAmount(CartProductRequest request) {
-        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
+    public void addAmount(CartProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+        UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
 
-        Product product = userProduct.getProduct();
         Long amount = userProduct.getAmount();
 
         if (product.getAmount() < amount + 1) {
@@ -110,14 +121,14 @@ public class CartService {
 
     @Transactional
     public void addProduct(AddProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
         if (authentication != null) {
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
-            if (productRepo.existsByTitle(product.getTitle())) {
+            if (userProductRepo.existsByProductTitle(product.getTitle())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар уже в корзине");
             }
 
@@ -127,9 +138,6 @@ public class CartService {
             userProduct.setAmount(1L);
             userProductRepo.save(userProduct);
         } else {
-            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
             Long productId = product.getId();
             cookieService.setCookie("pictureUrl" + productId, product.getPictureUrl());
             cookieService.setCookie("title" + productId, product.getTitle());
@@ -140,10 +148,23 @@ public class CartService {
 
     @Transactional
     public void deleteProduct(CartProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
-        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
-                new RuntimeException("Товар в корзине не найден"));
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        userProductRepo.delete(userProduct);
+            UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
+                    new RuntimeException("Товар в корзине не найден"));
+
+            userProductRepo.delete(userProduct);
+        } else {
+            Long productId = request.getProductId();
+            cookieService.deleteCookie("pictureUrl" + productId);
+            cookieService.deleteCookie("title" + productId);
+            cookieService.deleteCookie("price" + productId);
+            cookieService.deleteCookie("amount" + productId);
+        }
     }
 }

@@ -9,5 +9,5 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class CartProductRequest {
     @NotNull
-    private Long userProductId;
+    private Long productId;
 }

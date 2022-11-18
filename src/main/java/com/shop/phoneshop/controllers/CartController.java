@@ -36,13 +36,13 @@ public class CartController {
     }
 
     @PostMapping("/cart/addAmount")
-    public void addAmount(@Valid @RequestBody CartProductRequest request) {
-        cartService.addAmount(request);
+    public void addAmount(@Valid @RequestBody CartProductRequest request, JwtAuthentication authentication) {
+        cartService.addAmount(request, authentication);
     }
 
     @PostMapping("/cart/reduceAmount")
-    public void reduceAmount(@Valid @RequestBody CartProductRequest request) {
-        cartService.reduceAmount(request);
+    public void reduceAmount(@Valid @RequestBody CartProductRequest request, JwtAuthentication authentication) {
+        cartService.reduceAmount(request, authentication);
     }
 
     @DeleteMapping("/cart/deleteProduct")
