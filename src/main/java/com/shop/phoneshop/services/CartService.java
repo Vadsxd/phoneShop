@@ -137,4 +137,13 @@ public class CartService {
             cookieService.setCookie("amount" + productId, String.valueOf(1L));
         }
     }
+
+    @Transactional
+    public void deleteProduct(CartProductRequest request, JwtAuthentication authentication) {
+
+        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
+                new RuntimeException("Товар в корзине не найден"));
+
+        userProductRepo.delete(userProduct);
+    }
 }
