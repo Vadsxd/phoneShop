@@ -1,5 +1,6 @@
 package com.shop.phoneshop.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -11,6 +12,7 @@ public class CookieService {
     private final HttpServletResponse httpServletResponse;
     private final HttpServletRequest httpServletRequest;
 
+    @Autowired
     public CookieService(HttpServletResponse httpServletResponse,
                          HttpServletRequest httpServletRequest
                          ){

@@ -13,6 +13,7 @@ import com.shop.phoneshop.repos.UserRepo;
 import com.shop.phoneshop.requests.AddProductRequest;
 import com.shop.phoneshop.requests.CartProductRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class CartService {
     private final ProductRepo productRepo;
     private final CookieService cookieService;
 
+    @Autowired
     public CartService(UserProductRepo userProductRepo,
                        UserRepo userRepo,
                        ProductRepo productRepo,
@@ -51,7 +53,6 @@ public class CartService {
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
             Cookie[] cookies = cookieService.getCookie(httpServletRequest);
-            
         }
     }
 
@@ -90,10 +91,14 @@ public class CartService {
     public void addProduct(AddProductRequest request, JwtAuthentication authentication) {
         if (authentication != null) {
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                    new RuntimeException("Пользователь не найден"));
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
             Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                    new RuntimeException("Товар не найден"));
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+            if (productRepo.existsByTitle(product.getTitle())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар уже в корзине");
+            }
 
             UserProduct userProduct = new UserProduct();
             userProduct.setUser(user);
