@@ -23,8 +23,8 @@ public class CartController {
     }
 
     @GetMapping("/cart")
-    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication, HttpServletRequest httpServletRequest) {
-        return ResponseEntity.ok(cartService.getUserProducts(authentication, httpServletRequest));
+    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication) {
+        return ResponseEntity.ok(cartService.getUserProducts(authentication));
     }
 
     @PostMapping("/addProduct")
@@ -36,13 +36,13 @@ public class CartController {
     }
 
     @PostMapping("/cart/addAmount")
-    public void addAmount(@Valid @RequestBody CartProductRequest request) {
-        cartService.addAmount(request);
+    public void addAmount(@Valid @RequestBody CartProductRequest request, JwtAuthentication authentication) {
+        cartService.addAmount(request, authentication);
     }
 
     @PostMapping("/cart/reduceAmount")
-    public void reduceAmount(@Valid @RequestBody CartProductRequest request) {
-        cartService.reduceAmount(request);
+    public void reduceAmount(@Valid @RequestBody CartProductRequest request, JwtAuthentication authentication) {
+        cartService.reduceAmount(request, authentication);
     }
 
     @DeleteMapping("/cart/deleteProduct")

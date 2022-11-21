@@ -20,13 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -47,7 +45,7 @@ public class CartService {
         this.cookieService = cookieService;
     }
 
-    public CartDto getUserProducts(JwtAuthentication authentication, HttpServletRequest httpServletRequest) {
+    public CartDto getUserProducts(JwtAuthentication authentication) {
         if (authentication != null) {
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
@@ -57,11 +55,13 @@ public class CartService {
 
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
-            Cookie[] cookies = cookieService.getCookie(httpServletRequest);
-            if (cookies == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "В корзине нет товаров");
-            }
+            Cookie[] cookies = cookieService.getCookies();
             List<UserProductDto> userProductDtos = new ArrayList<>();
+
+            if (cookies == null) {
+                return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
+            }
+
             List<String> values = Arrays.stream(cookies)
                     .map(Cookie::getValue).toList();
             for (int i = 0; i < values.size(); i += 4) {
@@ -78,46 +78,92 @@ public class CartService {
     }
 
     @Transactional
-    public void reduceAmount(CartProductRequest request) {
-        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+    public void reduceAmount(CartProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
-        Long amount = userProduct.getAmount();
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        if (amount - 1 == 0) {
-            userProductRepo.delete(userProduct);
+            UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+
+            Long amount = userProduct.getAmount();
+
+            if (amount - 1 == 0) {
+                userProductRepo.delete(userProduct);
+            } else {
+                userProduct.setAmount(amount - 1);
+                userProductRepo.save(userProduct);
+            }
         } else {
-            userProduct.setAmount(amount - 1);
-            userProductRepo.save(userProduct);
+            String productTitle = product.getTitle();
+            String cookieAmountName = "amount_" + productTitle;
+            Cookie cookie = cookieService.getCookie(cookieAmountName);
+
+            long cookieValue = Long.parseLong(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
+
+            if (cookieValue - 1 == 0) {
+                cookieService.deleteCookie("pictureUrl_" + productTitle);
+                cookieService.deleteCookie("title_" + productTitle);
+                cookieService.deleteCookie("price_" + productTitle);
+                cookieService.deleteCookie(cookieAmountName);
+            } else {
+                cookieService.setCookie(cookieAmountName, String.valueOf(cookieValue - 1));
+            }
         }
     }
 
     @Transactional
-    public void addAmount(CartProductRequest request) {
-        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+    public void addAmount(CartProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
-        Product product = userProduct.getProduct();
-        Long amount = userProduct.getAmount();
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        if (product.getAmount() < amount + 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+            UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+
+            Long amount = userProduct.getAmount();
+
+            if (product.getAmount() < amount + 1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+            } else {
+                userProduct.setAmount(amount + 1);
+                userProductRepo.save(userProduct);
+            }
         } else {
-            userProduct.setAmount(amount + 1);
-            userProductRepo.save(userProduct);
+            String productTitle = product.getTitle();
+            String cookieAmountName = "amount_" + productTitle;
+            Cookie cookie = cookieService.getCookie(cookieAmountName);
+
+            long cookieValue = Long.parseLong(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
+
+            if (product.getAmount() < cookieValue + 1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+            } else {
+                cookieService.setCookie(cookieAmountName, String.valueOf(cookieValue + 1));
+            }
         }
     }
 
     @Transactional
     public void addProduct(AddProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        if (product.getAmount() == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товара нет в наличии");
+        }
+
         if (authentication != null) {
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
-            if (productRepo.existsByTitle(product.getTitle())) {
+            if (userProductRepo.existsByProductTitle(product.getTitle())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар уже в корзине");
             }
 
@@ -127,23 +173,35 @@ public class CartService {
             userProduct.setAmount(1L);
             userProductRepo.save(userProduct);
         } else {
-            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
-            Long productId = product.getId();
-            cookieService.setCookie("pictureUrl" + productId, product.getPictureUrl());
-            cookieService.setCookie("title" + productId, product.getTitle());
-            cookieService.setCookie("price" + productId, String.valueOf(product.getPrice()));
-            cookieService.setCookie("amount" + productId, String.valueOf(1L));
+            String productTitle = product.getTitle();
+            cookieService.setCookie("pictureUrl_" + productTitle, product.getPictureUrl());
+            cookieService.setCookie("title_" + productTitle, product.getTitle());
+            cookieService.setCookie("price_" + productTitle, String.valueOf(product.getPrice()));
+            cookieService.setCookie("amount_" + productTitle, String.valueOf(1L));
         }
     }
 
     @Transactional
     public void deleteProduct(CartProductRequest request, JwtAuthentication authentication) {
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
-        UserProduct userProduct = userProductRepo.findById(request.getUserProductId()).orElseThrow(() ->
-                new RuntimeException("Товар в корзине не найден"));
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        userProductRepo.delete(userProduct);
+            UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
+                    new RuntimeException("Товар в корзине не найден"));
+
+            userProductRepo.delete(userProduct);
+        } else {
+            String productTitle = product.getTitle();
+            cookieService.getCookie("title_" + productTitle);
+
+            cookieService.deleteCookie("pictureUrl_" + productTitle);
+            cookieService.deleteCookie("title_" + productTitle);
+            cookieService.deleteCookie("price_" + productTitle);
+            cookieService.deleteCookie("amount_" + productTitle);
+        }
     }
 }
