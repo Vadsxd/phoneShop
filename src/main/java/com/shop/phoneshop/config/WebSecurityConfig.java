@@ -44,9 +44,6 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .antMatchers("/swagger-ui/*", "/swagger-ui.html", "/webjars/**",
-                        "/v2/**", "/swagger-resources/**").permitAll()
-                .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

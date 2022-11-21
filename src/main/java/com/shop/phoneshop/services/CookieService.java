@@ -15,27 +15,33 @@ public class CookieService {
     private final HttpServletRequest httpServletRequest;
 
     @Autowired
-    public CookieService(HttpServletResponse httpServletResponse,
-                         HttpServletRequest httpServletRequest
-                         ){
+    public CookieService(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
         this.httpServletResponse = httpServletResponse;
         this.httpServletRequest = httpServletRequest;
     }
 
     public void setCookie(String name, String value) {
-        int expiresInSeconds = (12 * 60 * 60);
+        int expiresInSeconds = (6 * 60 * 60);
         Cookie cookie = new Cookie(name, URLEncoder.encode(value, StandardCharsets.UTF_8));
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+        cookie.setPath("/");
         cookie.setMaxAge(expiresInSeconds);
         httpServletResponse.addCookie(cookie);
     }
 
     public void deleteCookie(String name) {
         Cookie cookie = new Cookie(name, null);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+        cookie.setPath("/");
         cookie.setMaxAge(0);
         httpServletResponse.addCookie(cookie);
     }
 
-    public Cookie[] getCookie(HttpServletRequest httpServletRequest) {
+    public Cookie[] getCookie() {
         return httpServletRequest.getCookies();
     }
 }

@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class CartService {
         this.cookieService = cookieService;
     }
 
-    public CartDto getUserProducts(JwtAuthentication authentication, HttpServletRequest httpServletRequest) {
+    public CartDto getUserProducts(JwtAuthentication authentication) {
         if (authentication != null) {
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
@@ -57,11 +56,13 @@ public class CartService {
 
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
-            Cookie[] cookies = cookieService.getCookie(httpServletRequest);
-            if (cookies == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "В корзине нет товаров");
-            }
+            Cookie[] cookies = cookieService.getCookie();
             List<UserProductDto> userProductDtos = new ArrayList<>();
+
+            if (cookies == null) {
+                return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
+            }
+
             List<String> values = Arrays.stream(cookies)
                     .map(Cookie::getValue).toList();
             for (int i = 0; i < values.size(); i += 4) {
@@ -79,11 +80,11 @@ public class CartService {
 
     @Transactional
     public void reduceAmount(CartProductRequest request, JwtAuthentication authentication) {
-        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
         User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
         UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
@@ -148,10 +149,10 @@ public class CartService {
 
     @Transactional
     public void deleteProduct(CartProductRequest request, JwtAuthentication authentication) {
-        Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
         if (authentication != null) {
+            Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 

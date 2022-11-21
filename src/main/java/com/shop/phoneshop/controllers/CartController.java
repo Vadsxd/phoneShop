@@ -23,8 +23,8 @@ public class CartController {
     }
 
     @GetMapping("/cart")
-    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication, HttpServletRequest httpServletRequest) {
-        return ResponseEntity.ok(cartService.getUserProducts(authentication, httpServletRequest));
+    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication) {
+        return ResponseEntity.ok(cartService.getUserProducts(authentication));
     }
 
     @PostMapping("/addProduct")
