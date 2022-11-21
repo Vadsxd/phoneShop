@@ -196,6 +196,8 @@ public class CartService {
             userProductRepo.delete(userProduct);
         } else {
             String productTitle = product.getTitle();
+            cookieService.getCookie("title_" + productTitle);
+
             cookieService.deleteCookie("pictureUrl_" + productTitle);
             cookieService.deleteCookie("title_" + productTitle);
             cookieService.deleteCookie("price_" + productTitle);
