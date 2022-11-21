@@ -33,12 +33,14 @@ public class CatalogService {
 
     public List<ProductDto> getAllProducts(JwtAuthentication authentication) {
         List<Product> products = productRepo.findAll();
+
         return ProductMapper.fromProductsToDtos(products, authentication);
     }
 
     public ProductDto getProduct(Long id, JwtAuthentication authentication) {
         Product product = productRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден"));
+
         return ProductMapper.fromProductToDto(product, authentication);
     }
 
@@ -48,6 +50,7 @@ public class CatalogService {
         List<Product> products = category.getSubcategories().stream()
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
+
         return ProductMapper.fromProductsToDtos(products, authentication);
     }
 
@@ -55,6 +58,7 @@ public class CatalogService {
         Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
+
         return ProductMapper.fromProductsToDtos(products, authentication);
     }
 
@@ -67,6 +71,7 @@ public class CatalogService {
                 .getProducts();
         List<Product> products = new ArrayList<>(headphones);
         products.addAll(covers);
+
         return ProductMapper.fromProductsToDtos(products, authentication);
     }
 }
