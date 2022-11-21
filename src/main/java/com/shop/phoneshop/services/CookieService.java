@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 public class CookieService {
@@ -41,7 +43,11 @@ public class CookieService {
         httpServletResponse.addCookie(cookie);
     }
 
-    public Cookie[] getCookie() {
+    public Cookie[] getCookies() {
         return httpServletRequest.getCookies();
+    }
+
+    public Cookie getCookie(String name) {
+        return Arrays.stream(httpServletRequest.getCookies()).filter(c -> c.getName().equals(name)).toList().get(0);
     }
 }

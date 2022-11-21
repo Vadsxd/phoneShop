@@ -56,7 +56,7 @@ public class CartService {
 
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
-            Cookie[] cookies = cookieService.getCookie();
+            Cookie[] cookies = cookieService.getCookies();
             List<UserProductDto> userProductDtos = new ArrayList<>();
 
             if (cookies == null) {
@@ -104,19 +104,31 @@ public class CartService {
         Product product = productRepo.findById(request.getProductId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
-        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
+            UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
 
-        Long amount = userProduct.getAmount();
+            Long amount = userProduct.getAmount();
 
-        if (product.getAmount() < amount + 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+            if (product.getAmount() < amount + 1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+            } else {
+                userProduct.setAmount(amount + 1);
+                userProductRepo.save(userProduct);
+            }
         } else {
-            userProduct.setAmount(amount + 1);
-            userProductRepo.save(userProduct);
+            String productTitle = product.getTitle();
+            Cookie cookie = cookieService.getCookie("title_" + productTitle);
+            long cookieValue = Long.parseLong(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
+
+            if (product.getAmount() < cookieValue + 1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
+            } else {
+                cookie.setValue(String.valueOf(cookieValue + 1));
+            }
         }
     }
 
