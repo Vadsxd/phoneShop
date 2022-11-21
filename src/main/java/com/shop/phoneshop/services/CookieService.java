@@ -1,14 +1,18 @@
 package com.shop.phoneshop.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +52,16 @@ public class CookieService {
     }
 
     public Cookie getCookie(String name) {
-        return Arrays.stream(httpServletRequest.getCookies()).filter(c -> c.getName().equals(name)).toList().get(0);
+        if (httpServletRequest.getCookies() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар в корзине не найден");
+        }
+
+        List<Cookie> cookies = Arrays.stream(httpServletRequest.getCookies()).filter(c -> c.getName().equals(name)).toList();
+
+        if (cookies.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар в корзине не найден");
+        }
+
+        return cookies.get(0);
     }
 }
