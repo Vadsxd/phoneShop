@@ -45,7 +45,7 @@ public class CookieService {
         httpServletResponse.addCookie(cookie);
     }
 
-    public Cookie[] getCookies() {
+    public Cookie[] getAllCookies() {
         return httpServletRequest.getCookies();
     }
 

@@ -13,6 +13,7 @@ import com.shop.phoneshop.repos.UserRepo;
 import com.shop.phoneshop.requests.AddProductRequest;
 import com.shop.phoneshop.requests.CartProductRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class CartService {
 
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
-            Cookie[] cookies = cookieService.getCookies();
+            Cookie[] cookies = cookieService.getAllCookies();
             List<UserProductDto> userProductDtos = new ArrayList<>();
 
             if (cookies == null) {
@@ -63,13 +64,17 @@ public class CartService {
             }
 
             List<String> values = Arrays.stream(cookies)
-                    .map(Cookie::getValue).toList();
-            for (int i = 0; i < values.size(); i += 4) {
+                    .filter(c -> c.getName().contains("user_product_"))
+                    .map(Cookie::getValue)
+                    .toList();
+
+            for (String value : values) {
                 UserProductDto dto = new UserProductDto();
-                dto.setPictureUrl(URLDecoder.decode(values.get(i), StandardCharsets.UTF_8));
-                dto.setTitle(URLDecoder.decode(values.get(i + 1), StandardCharsets.UTF_8));
-                dto.setPrice(Long.parseLong(URLDecoder.decode(values.get(i + 2), StandardCharsets.UTF_8)));
-                dto.setAmount(Long.parseLong(URLDecoder.decode(values.get(i + 3), StandardCharsets.UTF_8)));
+                JSONObject json = new JSONObject(URLDecoder.decode(value, StandardCharsets.UTF_8));
+                dto.setPictureUrl((String) json.get("pictureUrl"));
+                dto.setTitle((String) json.get("title"));
+                dto.setPrice(((Number) json.get("price")).longValue());
+                dto.setAmount(((Number) json.get("amount")).longValue());
                 userProductDtos.add(dto);
             }
 
@@ -98,19 +103,16 @@ public class CartService {
                 userProductRepo.save(userProduct);
             }
         } else {
-            String productTitle = product.getTitle();
-            String cookieAmountName = "amount_" + productTitle;
-            Cookie cookie = cookieService.getCookie(cookieAmountName);
+            Cookie cookie = cookieService.getCookie("user_product_" + product.getId());
+            JSONObject json = new JSONObject(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
 
-            long cookieValue = Long.parseLong(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
+            long cookieValue = ((Number) json.get("amount")).longValue();
 
             if (cookieValue - 1 == 0) {
-                cookieService.deleteCookie("pictureUrl_" + productTitle);
-                cookieService.deleteCookie("title_" + productTitle);
-                cookieService.deleteCookie("price_" + productTitle);
-                cookieService.deleteCookie(cookieAmountName);
+                cookieService.deleteCookie("user_product_" + product.getId());
             } else {
-                cookieService.setCookie(cookieAmountName, String.valueOf(cookieValue - 1));
+                json.put("amount", cookieValue - 1);
+                cookieService.setCookie("user_product_" + product.getId(), String.valueOf(json));
             }
         }
     }
@@ -136,16 +138,16 @@ public class CartService {
                 userProductRepo.save(userProduct);
             }
         } else {
-            String productTitle = product.getTitle();
-            String cookieAmountName = "amount_" + productTitle;
-            Cookie cookie = cookieService.getCookie(cookieAmountName);
+            Cookie cookie = cookieService.getCookie("user_product_" + product.getId());
+            JSONObject json = new JSONObject(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
 
-            long cookieValue = Long.parseLong(URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
+            long cookieValue = ((Number) json.get("amount")).longValue();
 
             if (product.getAmount() < cookieValue + 1) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого количества товара нет на складе");
             } else {
-                cookieService.setCookie(cookieAmountName, String.valueOf(cookieValue + 1));
+                json.put("amount", cookieValue + 1);
+                cookieService.setCookie("user_product_" + product.getId(), String.valueOf(json));
             }
         }
     }
@@ -173,11 +175,12 @@ public class CartService {
             userProduct.setAmount(1L);
             userProductRepo.save(userProduct);
         } else {
-            String productTitle = product.getTitle();
-            cookieService.setCookie("pictureUrl_" + productTitle, product.getPictureUrl());
-            cookieService.setCookie("title_" + productTitle, product.getTitle());
-            cookieService.setCookie("price_" + productTitle, String.valueOf(product.getPrice()));
-            cookieService.setCookie("amount_" + productTitle, String.valueOf(1L));
+            JSONObject json = new JSONObject();
+            json.put("pictureUrl", product.getPictureUrl());
+            json.put("title", product.getTitle());
+            json.put("price", product.getPrice());
+            json.put("amount", 1L);
+            cookieService.setCookie("user_product_" + product.getId(), String.valueOf(json));
         }
     }
 
@@ -195,13 +198,7 @@ public class CartService {
 
             userProductRepo.delete(userProduct);
         } else {
-            String productTitle = product.getTitle();
-            cookieService.getCookie("title_" + productTitle);
-
-            cookieService.deleteCookie("pictureUrl_" + productTitle);
-            cookieService.deleteCookie("title_" + productTitle);
-            cookieService.deleteCookie("price_" + productTitle);
-            cookieService.deleteCookie("amount_" + productTitle);
+            cookieService.deleteCookie("user_product_" + product.getId());
         }
     }
 }

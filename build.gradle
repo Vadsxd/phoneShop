@@ -48,6 +48,7 @@ dependencies {
 
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.json:json:20220924'
 
     // Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
