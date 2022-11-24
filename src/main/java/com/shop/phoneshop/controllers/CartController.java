@@ -45,6 +45,11 @@ public class CartController {
         cartService.reduceAmount(request, authentication);
     }
 
+    @PostMapping("/cart/transaction")
+    public void buyProducts(JwtAuthentication authentication) {
+        cartService.buyProducts(authentication);
+    }
+
     @DeleteMapping("/cart/deleteProduct")
     public void deleteProduct(
             @Valid @RequestBody CartProductRequest request,
