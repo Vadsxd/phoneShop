@@ -33,17 +33,20 @@ public class CartService {
     private final UserRepo userRepo;
     private final ProductRepo productRepo;
     private final CookieService cookieService;
+    private final EmailService emailService;
 
     @Autowired
     public CartService(UserProductRepo userProductRepo,
                        UserRepo userRepo,
                        ProductRepo productRepo,
-                       CookieService cookieService
+                       CookieService cookieService,
+                       EmailService emailService
     ) {
         this.userProductRepo = userProductRepo;
         this.userRepo = userRepo;
         this.productRepo = productRepo;
         this.cookieService = cookieService;
+        this.emailService = emailService;
     }
 
     public CartDto getUserProducts(JwtAuthentication authentication) {
@@ -217,6 +220,8 @@ public class CartService {
                 productRepo.save(product);
             }
 
+            //TODO генерация сообщения
+            emailService.sendSimpleEmail(user.getEmail(), "transaction", "hello Seattle");
             userProductRepo.deleteAllByUser(user);
         } else {
             Cookie[] cookies = cookieService.getAllCookies();

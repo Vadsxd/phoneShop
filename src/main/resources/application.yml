@@ -28,6 +28,21 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+
 springfox:
   documentation:
     swagger:
