@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface UserProductRepo extends JpaRepository<UserProduct, Long> {
     List<UserProduct> findAllByUser(User user);
+    void deleteAllByUser(User user);
     Optional<UserProduct> findByProductAndUser(Product product, User user);
     Boolean existsByProductTitle(String title);
 }

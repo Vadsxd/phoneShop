@@ -201,4 +201,49 @@ public class CartService {
             cookieService.deleteCookie("user_product_" + product.getId());
         }
     }
+
+    @Transactional
+    public void buyProducts(JwtAuthentication authentication) {
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+            List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
+
+            for (UserProduct userProduct: userProducts) {
+                Product product = userProduct.getProduct();
+                Long productAmount = product.getAmount();
+                product.setAmount(productAmount - userProduct.getAmount());
+                productRepo.save(product);
+            }
+
+            userProductRepo.deleteAllByUser(user);
+        } else {
+            Cookie[] cookies = cookieService.getAllCookies();
+
+            if (cookies == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Корзина пустая");
+            }
+
+            List<Cookie> sortCookies = Arrays.stream(cookies)
+                    .filter(c -> c.getName().contains("user_product_"))
+                    .toList();
+
+            if (sortCookies.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Корзина пустая");
+            }
+
+            for (Cookie sortCookie : sortCookies) {
+                Long productId = Long.valueOf(sortCookie.getName().replace("user_product_",""));
+                Product product = productRepo.findById(productId).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+                Long productAmount = product.getAmount();
+                JSONObject json = new JSONObject(URLDecoder.decode(sortCookie.getValue(), StandardCharsets.UTF_8));
+                long cookieValue = ((Number) json.get("amount")).longValue();
+                product.setAmount(productAmount - cookieValue);
+                productRepo.save(product);
+                cookieService.deleteCookie(sortCookie.getName());
+            }
+        }
+    }
 }

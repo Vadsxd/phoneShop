@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -43,6 +42,11 @@ public class CartController {
     @PostMapping("/cart/reduceAmount")
     public void reduceAmount(@Valid @RequestBody CartProductRequest request, JwtAuthentication authentication) {
         cartService.reduceAmount(request, authentication);
+    }
+
+    @PostMapping("/cart/transaction")
+    public void buyProducts(JwtAuthentication authentication) {
+        cartService.buyProducts(authentication);
     }
 
     @DeleteMapping("/cart/deleteProduct")
