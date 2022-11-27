@@ -1,13 +1,11 @@
 package com.shop.phoneshop.services;
 
-import com.shop.phoneshop.domain.Category;
-import com.shop.phoneshop.domain.Product;
-import com.shop.phoneshop.domain.Subcategory;
+import com.shop.phoneshop.domain.*;
+import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.mappers.CatalogMapper;
 import com.shop.phoneshop.mappers.ProductMapper;
-import com.shop.phoneshop.repos.CategoryRepo;
-import com.shop.phoneshop.repos.ProductRepo;
-import com.shop.phoneshop.repos.SubcategoryRepo;
+import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,41 +20,65 @@ public class CatalogService {
     private final CategoryRepo categoryRepo;
     private final ProductRepo productRepo;
     private final SubcategoryRepo subcategoryRepo;
+    private final UserRepo userRepo;
+    private final UserProductRepo userProductRepo;
 
-    public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo, SubcategoryRepo subcategoryRepo) {
+    public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo,
+                          SubcategoryRepo subcategoryRepo, UserRepo userRepo, UserProductRepo userProductRepo) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
         this.subcategoryRepo = subcategoryRepo;
+        this.userRepo = userRepo;
+        this.userProductRepo = userProductRepo;
     }
 
-    public List<ProductDto> getAllProducts(JwtAuthentication authentication) {
+    public CatalogDto getAllProducts(JwtAuthentication authentication) {
         List<Product> products = productRepo.findAll();
-        return ProductMapper.fromProductsToDtos(products, authentication);
+        return getCatalogDto(authentication, products);
     }
 
-    public ProductDto getProduct(Long id, JwtAuthentication authentication) {
+    private CatalogDto getCatalogDto(JwtAuthentication authentication, List<Product> products) {
+        List<ProductDto> productDtos = ProductMapper.fromProductsToDtos(products, authentication);
+
+        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+        List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
+
+        return CatalogMapper.fromProductDtosAndUserProductsToCatalogDto(productDtos, userProducts);
+    }
+
+    public CatalogDto getProduct(Long id, JwtAuthentication authentication) {
         Product product = productRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден"));
-        return ProductMapper.fromProductToDto(product, authentication);
+
+        ProductDto productDto = ProductMapper.fromProductToDto(product, authentication);
+
+        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+        List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
+
+        return CatalogMapper.fromProductDtoAndUserProductsToCatalogDto(productDto, userProducts);
     }
 
-    public List<ProductDto> getAllProductsFromCategory(String title, JwtAuthentication authentication) {
+    public CatalogDto getAllProductsFromCategory(String title, JwtAuthentication authentication) {
         Category category = categoryRepo.findByTitle(title).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной категории не найдены"));
         List<Product> products = category.getSubcategories().stream()
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
-        return ProductMapper.fromProductsToDtos(products, authentication);
+
+        return getCatalogDto(authentication, products);
     }
 
-    public List<ProductDto> getAllProductsFromSubcategory(String title, JwtAuthentication authentication) {
+    public CatalogDto getAllProductsFromSubcategory(String title, JwtAuthentication authentication) {
         Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
-        return ProductMapper.fromProductsToDtos(products, authentication);
+
+        return getCatalogDto(authentication, products);
     }
 
-    public List<ProductDto> getSmartphonesExtraProducts(JwtAuthentication authentication) {
+    public CatalogDto getSmartphonesExtraProducts(JwtAuthentication authentication) {
         List<Product> headphones = subcategoryRepo.findByTitle("Headphones").orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
                 .getProducts();
@@ -65,6 +87,7 @@ public class CatalogService {
                 .getProducts();
         List<Product> products = new ArrayList<>(headphones);
         products.addAll(covers);
-        return ProductMapper.fromProductsToDtos(products, authentication);
+
+        return getCatalogDto(authentication, products);
     }
 }
