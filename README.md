@@ -16,5 +16,9 @@
 + export JWT_ACCESS_SECRET=<>
 + export JWT_REFRESH_SECRET=<>
 
+*Установить почту и пароль хоста для отправки писем о транзакциях:*
++ export MAIL_USERNAME=<>
++ export MAIL_PASSWORD=<>
+
 *Сборка с помощью gradle:*
 + gradle clean bootRun
