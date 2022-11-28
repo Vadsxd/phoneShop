@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  phoneShop:
+    network_mode: host
+    container_name: phoneShop_container
+    build: ./
+    env_file:
+      - .env
+    volumes:
+      - /var/phoneShop/logs:/logs
+

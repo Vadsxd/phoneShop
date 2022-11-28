@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.shop'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = '18'
 
 configurations {
     compileOnly {
@@ -41,7 +41,7 @@ dependencies {
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.5'
     implementation 'org.postgresql:postgresql:42.5.0'
-    implementation 'org.flywaydb:flyway-core:9.5.1'
+    implementation 'org.flywaydb:flyway-core:9.8.2'
 
     // Swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
@@ -50,7 +50,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.json:json:20220924'
     implementation 'javax.mail:javax.mail-api:1.6.2'
-    implementation 'com.sun.mail:javax.mail:1.6.0'
+    implementation 'com.sun.mail:javax.mail:1.6.2'
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.0'
     implementation 'javax.activation:activation:1.1.1'
 

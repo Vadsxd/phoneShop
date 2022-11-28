@@ -9,6 +9,7 @@
 Установить переменные окружения через терминал или IDEA:
 
 *PostgreSQL:*
++ export DB_URL=<>
 + export DB_USERNAME=<>
 + export DB_PASSWORD=<>
 
@@ -24,3 +25,6 @@
 + gradle clean bootRun
 
 ## Docker
+Для Docker Compose можно использовать конфигурацию с помощью `.env` файла.
+
+См. пример `.env.example`
