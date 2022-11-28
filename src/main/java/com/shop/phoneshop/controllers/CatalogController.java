@@ -1,5 +1,6 @@
 package com.shop.phoneshop.controllers;
 
+import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CatalogService;
@@ -23,48 +24,47 @@ public class CatalogController {
     }
 
     @GetMapping("/catalog")
-    ResponseEntity<List<ProductDto>> getAllProducts(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getAllProducts(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProducts(authentication));
     }
 
     @GetMapping("/catalog/product/{id}")
-    ResponseEntity<ProductDto> getProduct(@PathVariable Long id, JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getProduct(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProduct(id, authentication));
     }
 
     @GetMapping("/catalog/smartphones")
-    ResponseEntity<List<ProductDto>> getSmartphones(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getSmartphones(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProductsFromCategory("Smartphones", authentication));
     }
 
     @GetMapping("/catalog/audioTechs")
-    ResponseEntity<List<ProductDto>> getAudioTechnics(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getAudioTechnics(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProductsFromCategory("AudioTechnics", authentication));
     }
 
     @GetMapping("/catalog/audioTechs/portableSpeakers")
-    ResponseEntity<List<ProductDto>> getPortableSpeakers(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getPortableSpeakers(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("PortableSpeakers", authentication));
     }
 
     @GetMapping("/catalog/audioTechs/headphones")
-    ResponseEntity<List<ProductDto>> getHeadphones(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getHeadphones(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("Headphones", authentication));
     }
 
     @GetMapping("/catalog/smartphones/apple")
-    ResponseEntity<List<ProductDto>> getAppleSmartphones(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getAppleSmartphones(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("Apple", authentication));
     }
 
     @GetMapping("/catalog/smartphones/onePlus")
-    ResponseEntity<List<ProductDto>> getOnePlusSmartphones(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getOnePlusSmartphones(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("OnePlus", authentication));
     }
 
     @GetMapping("/catalog/smartphones/extraProducts")
-    ResponseEntity<List<ProductDto>> getSmartphonesExtraProducts(JwtAuthentication authentication) {
+    ResponseEntity<CatalogDto> getSmartphonesExtraProducts(JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getSmartphonesExtraProducts(authentication));
     }
-
 }
