@@ -213,15 +213,31 @@ public class CartService {
 
             List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
 
+            StringBuilder message = new StringBuilder();
+            long fullPrice = 0L;
+
             for (UserProduct userProduct: userProducts) {
                 Product product = userProduct.getProduct();
                 Long productAmount = product.getAmount();
+                Long productPrice = product.getPrice();
+                Long userProductPrice = userProduct.getAmount();
+                fullPrice += productPrice * userProductPrice;
                 product.setAmount(productAmount - userProduct.getAmount());
+                message.append("Title: ")
+                        .append(product.getTitle())
+                        .append(". ")
+                        .append("Amount: ")
+                        .append(userProductPrice)
+                        .append(". ")
+                        .append("Price: ")
+                        .append(productPrice)
+                        .append("\n");
                 productRepo.save(product);
             }
+            message.append("Full price: ")
+                    .append(fullPrice);
 
-            //TODO генерация сообщения
-            emailService.sendSimpleEmail(user.getEmail(), "transaction", "hello Seattle");
+            emailService.sendSimpleEmail(user.getEmail(), "Shop Transaction", String.valueOf(message));
             userProductRepo.deleteAllByUser(user);
         } else {
             Cookie[] cookies = cookieService.getAllCookies();
