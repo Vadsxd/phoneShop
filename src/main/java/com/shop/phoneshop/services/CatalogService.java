@@ -36,10 +36,10 @@ public class CatalogService {
 
     public CatalogDto getAllProducts(JwtAuthentication authentication) {
         List<Product> products = productRepo.findAll();
-        return formingCatalogDto(authentication, products);
+        return getCatalogDto(authentication, products);
     }
 
-    private CatalogDto formingCatalogDto(JwtAuthentication authentication, List<Product> products) {
+    private CatalogDto getCatalogDto(JwtAuthentication authentication, List<Product> products) {
         List<ProductDto> productDtos = ProductMapper.fromProductsToDtos(products, authentication);
 
         User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
@@ -69,7 +69,7 @@ public class CatalogService {
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
 
-        return formingCatalogDto(authentication, products);
+        return getCatalogDto(authentication, products);
     }
 
     public CatalogDto getAllProductsFromSubcategory(String title, JwtAuthentication authentication) {
@@ -77,7 +77,7 @@ public class CatalogService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
 
-        return formingCatalogDto(authentication, products);
+        return getCatalogDto(authentication, products);
     }
 
     public CatalogDto getSmartphonesExtraProducts(JwtAuthentication authentication) {
@@ -90,6 +90,6 @@ public class CatalogService {
         List<Product> products = new ArrayList<>(headphones);
         products.addAll(covers);
 
-        return formingCatalogDto(authentication, products);
+        return getCatalogDto(authentication, products);
     }
 }

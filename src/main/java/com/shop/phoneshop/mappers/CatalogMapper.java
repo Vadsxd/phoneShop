@@ -13,9 +13,7 @@ public interface CatalogMapper {
         CatalogDto catalogDto = new CatalogDto();
 
         catalogDto.setProductDtos(productDtos);
-
         catalogDto.setCategoryCount((long) productDtos.size());
-
         catalogDto.setCartCount(userProducts.stream().
                 flatMapToLong(a -> LongStream.of(a.getAmount()))
                 .sum());
@@ -29,9 +27,7 @@ public interface CatalogMapper {
         List<ProductDto> productDtos = new ArrayList<>();
         productDtos.add(productDto);
         catalogDto.setProductDtos(productDtos);
-
         catalogDto.setCategoryCount((long) productDtos.size());
-
         catalogDto.setCartCount(userProducts.stream().
                 flatMapToLong(a -> LongStream.of(a.getAmount()))
                 .sum());
