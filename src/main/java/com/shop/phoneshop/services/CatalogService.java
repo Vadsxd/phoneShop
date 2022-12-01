@@ -39,7 +39,7 @@ public class CatalogService {
 
     public ProductDto getProduct(Long id, JwtAuthentication authentication) {
         Product product = productRepo.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден"));
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
 
         return ProductMapper.fromProductToDto(product, authentication);
     }

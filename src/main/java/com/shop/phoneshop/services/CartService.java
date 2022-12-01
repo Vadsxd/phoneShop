@@ -197,10 +197,11 @@ public class CartService {
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
             UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
-                    new RuntimeException("Товар в корзине не найден"));
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
 
             userProductRepo.delete(userProduct);
         } else {
+            cookieService.getCookie("user_product_" + product.getId());
             cookieService.deleteCookie("user_product_" + product.getId());
         }
     }

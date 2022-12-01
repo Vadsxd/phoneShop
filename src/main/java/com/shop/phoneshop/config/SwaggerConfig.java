@@ -3,12 +3,13 @@ package com.shop.phoneshop.config;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.builders.ResponseBuilder;
-import springfox.documentation.service.*;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -22,20 +23,8 @@ import static springfox.documentation.service.ApiInfo.DEFAULT_CONTACT;
 public class SwaggerConfig {
     @Bean
     public Docket api() {
-        ResponseBuilder builder = new ResponseBuilder();
-        Response unauthorizedResponse = builder.code("401").description("Не авторизован").build();
-        List<Response> unauthorizedResponses = List.of(unauthorizedResponse);
-        List<Response> adminResponses = List.of(
-                unauthorizedResponse,
-                builder.code("400").description("Ошибка валидации данных").build()
-        );
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
-                .globalResponses(HttpMethod.GET, unauthorizedResponses)
-                .globalResponses(HttpMethod.DELETE, unauthorizedResponses)
-                .globalResponses(HttpMethod.POST, adminResponses)
-                .globalResponses(HttpMethod.PUT, adminResponses)
                 .ignoredParameterTypes(JwtAuthentication.class)
                 .securityContexts(List.of(securityContext()))
                 .securitySchemes(List.of(apiKey()))
