@@ -2,6 +2,7 @@ package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.mappers.ProductMapper;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class CatalogController {
     }
 
     @GetMapping("/catalog/product/{id}")
-    ResponseEntity<CatalogDto> getProduct(@PathVariable Long id, JwtAuthentication authentication) {
+    ResponseEntity<ProductDto> getProduct(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProduct(id, authentication));
     }
 

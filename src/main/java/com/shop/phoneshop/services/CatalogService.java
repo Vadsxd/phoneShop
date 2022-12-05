@@ -3,16 +3,24 @@ package com.shop.phoneshop.services;
 import com.shop.phoneshop.domain.*;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.dto.UserProductDto;
+import com.shop.phoneshop.mappers.CartMapper;
 import com.shop.phoneshop.mappers.CatalogMapper;
 import com.shop.phoneshop.mappers.ProductMapper;
+import com.shop.phoneshop.mappers.UserProductMapper;
 import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.Cookie;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,15 +31,18 @@ public class CatalogService {
     private final SubcategoryRepo subcategoryRepo;
     private final UserRepo userRepo;
     private final UserProductRepo userProductRepo;
+    private final CookieService cookieService;
 
     @Autowired
     public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo,
-                          SubcategoryRepo subcategoryRepo, UserRepo userRepo, UserProductRepo userProductRepo) {
+                          SubcategoryRepo subcategoryRepo, UserRepo userRepo,
+                          UserProductRepo userProductRepo, CookieService cookieService) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
         this.subcategoryRepo = subcategoryRepo;
         this.userRepo = userRepo;
         this.userProductRepo = userProductRepo;
+        this.cookieService = cookieService;
     }
 
     public CatalogDto getAllProducts(JwtAuthentication authentication) {
@@ -42,24 +53,46 @@ public class CatalogService {
     private CatalogDto getCatalogDto(JwtAuthentication authentication, List<Product> products) {
         List<ProductDto> productDtos = ProductMapper.fromProductsToDtos(products, authentication);
 
-        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-        List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProducts);
+            List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
+            List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts);
+
+            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+        } else {
+            Cookie[] cookies = cookieService.getAllCookies();
+            List<UserProductDto> userProductDtos = new ArrayList<>();
+
+            if (cookies == null) {
+                return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+            }
+
+            List<String> values = Arrays.stream(cookies)
+                    .filter(c -> c.getName().contains("user_product_"))
+                    .map(Cookie::getValue)
+                    .toList();
+
+            for (String value : values) {
+                UserProductDto dto = new UserProductDto();
+                JSONObject json = new JSONObject(URLDecoder.decode(value, StandardCharsets.UTF_8));
+                dto.setPictureUrl((String) json.get("pictureUrl"));
+                dto.setTitle((String) json.get("title"));
+                dto.setPrice(((Number) json.get("price")).longValue());
+                dto.setAmount(((Number) json.get("amount")).longValue());
+                userProductDtos.add(dto);
+            }
+
+            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+        }
     }
 
-    public CatalogDto getProduct(Long id, JwtAuthentication authentication) {
+    public ProductDto getProduct(Long id, JwtAuthentication authentication) {
         Product product = productRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукт не найден"));
 
-        ProductDto productDto = ProductMapper.fromProductToDto(product, authentication);
-
-        User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-        List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
-
-        return CatalogMapper.fromProductDtoToCatalogDto(productDto, userProducts);
+        return ProductMapper.fromProductToDto(product, authentication);
     }
 
     public CatalogDto getAllProductsFromCategory(String title, JwtAuthentication authentication) {
@@ -68,7 +101,6 @@ public class CatalogService {
         List<Product> products = category.getSubcategories().stream()
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
-
         return getCatalogDto(authentication, products);
     }
 
@@ -76,7 +108,6 @@ public class CatalogService {
         Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
-
         return getCatalogDto(authentication, products);
     }
 
@@ -89,7 +120,6 @@ public class CatalogService {
                 .getProducts();
         List<Product> products = new ArrayList<>(headphones);
         products.addAll(covers);
-
         return getCatalogDto(authentication, products);
     }
 }
