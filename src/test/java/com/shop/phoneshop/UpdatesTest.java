@@ -1,16 +1,22 @@
 package com.shop.phoneshop;
 
-import com.shop.phoneshop.domain.Product;
-import com.shop.phoneshop.domain.User;
-import com.shop.phoneshop.domain.UserProduct;
+import com.shop.phoneshop.config.WebSecurityConfig;
+import com.shop.phoneshop.security.jwt.JwtAuthEntryPoint;
+import com.shop.phoneshop.security.jwt.JwtFilter;
+import com.shop.phoneshop.security.jwt.JwtProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @AutoConfigureMockMvc
+@SpringBootTest(classes = {WebSecurityConfig.class, JwtAuthEntryPoint.class, JwtFilter.class, JwtProvider.class})
 public class UpdatesTest {
     private final MockMvc mockMvc;
 
@@ -20,29 +26,10 @@ public class UpdatesTest {
     }
 
     @Test
-    void addedAmount() throws Exception {
-        User user = new User();
-        user.setLastName("Lucich");
-        user.setFirstName("Kolya");
-        user.setPassword("123");
-        user.setEmail("papa@mail.ru");
-
-        Product product = new Product();
-        product.setTitle("Apple");
-        product.setDescription("YEEEEES");
-        product.setAmount(3L);
-        product.setPrice(10000L);
-        product.setDiscount(true);
-        product.setDiscountPrice(90000L);
-        product.setPictureUrl("url");
-
-        UserProduct userProduct = new UserProduct();
-        userProduct.setUser(user);
-        userProduct.setAmount(2L);
-        userProduct.setProduct(product);
-
+    void giveCart() throws Exception {
         mockMvc
-                .perform(putRequest(request))
+                .perform(get("/api/cart").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
 }

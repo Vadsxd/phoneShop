@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.modelmapper:modelmapper:3.1.0'
 
     // Web
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.0'
 
     // Security
     implementation 'org.springframework.boot:spring-boot-starter-security:2.7.5'
@@ -36,27 +36,26 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // Validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.5'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.0'
 
     // Database
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.5'
-    implementation 'org.postgresql:postgresql:42.5.0'
-    implementation 'org.flywaydb:flyway-core:9.8.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.0'
+    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.flywaydb:flyway-core:9.8.3'
 
     // Swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
     // Development
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools:3.0.0'
     implementation 'org.json:json:20220924'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     implementation 'com.sun.mail:javax.mail:1.6.2'
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.0'
     implementation 'javax.activation:activation:1.1.1'
 
-
     // Tests
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.0'
 }
 
 tasks.named('test') {
