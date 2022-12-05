@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  backend:
+    container_name: phone_shop
+    build: .
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - postgresql
+    environment:
+      DB_URL: postgresql://postgresql:5432/postgres
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - /var/log/phone_shop:/logs
+
+  postgresql:
+    container_name: phone_shop_db
+    image: "postgres:14.2"
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: phone_shop_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}

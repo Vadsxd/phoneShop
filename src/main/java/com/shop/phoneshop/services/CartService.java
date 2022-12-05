@@ -33,17 +33,20 @@ public class CartService {
     private final UserRepo userRepo;
     private final ProductRepo productRepo;
     private final CookieService cookieService;
+    private final EmailService emailService;
 
     @Autowired
     public CartService(UserProductRepo userProductRepo,
                        UserRepo userRepo,
                        ProductRepo productRepo,
-                       CookieService cookieService
+                       CookieService cookieService,
+                       EmailService emailService
     ) {
         this.userProductRepo = userProductRepo;
         this.userRepo = userRepo;
         this.productRepo = productRepo;
         this.cookieService = cookieService;
+        this.emailService = emailService;
     }
 
     public CartDto getUserProducts(JwtAuthentication authentication) {
@@ -194,10 +197,11 @@ public class CartService {
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
             UserProduct userProduct = userProductRepo.findByProductAndUser(product, user).orElseThrow(() ->
-                    new RuntimeException("Товар в корзине не найден"));
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар в корзине не найден"));
 
             userProductRepo.delete(userProduct);
         } else {
+            cookieService.getCookie("user_product_" + product.getId());
             cookieService.deleteCookie("user_product_" + product.getId());
         }
     }
@@ -210,13 +214,31 @@ public class CartService {
 
             List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
 
+            StringBuilder message = new StringBuilder();
+            long fullPrice = 0L;
+
             for (UserProduct userProduct: userProducts) {
                 Product product = userProduct.getProduct();
                 Long productAmount = product.getAmount();
+                Long productPrice = product.getPrice();
+                Long userProductPrice = userProduct.getAmount();
+                fullPrice += productPrice * userProductPrice;
                 product.setAmount(productAmount - userProduct.getAmount());
+                message.append("Title: ")
+                        .append(product.getTitle())
+                        .append(". ")
+                        .append("Amount: ")
+                        .append(userProductPrice)
+                        .append(". ")
+                        .append("Price: ")
+                        .append(productPrice)
+                        .append("\n");
                 productRepo.save(product);
             }
+            message.append("Full price: ")
+                    .append(fullPrice);
 
+            emailService.sendSimpleEmail(user.getEmail(), "Shop Transaction", String.valueOf(message));
             userProductRepo.deleteAllByUser(user);
         } else {
             Cookie[] cookies = cookieService.getAllCookies();
