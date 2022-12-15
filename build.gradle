@@ -56,6 +56,7 @@ dependencies {
 
     // Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test:4.2.3.RELEASE'
 }
 
 tasks.named('test') {
