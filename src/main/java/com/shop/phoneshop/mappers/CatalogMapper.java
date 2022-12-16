@@ -1,10 +1,9 @@
 package com.shop.phoneshop.mappers;
 
-import com.shop.phoneshop.dto.UserProductDto;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.dto.UserProductDto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
