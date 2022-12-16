@@ -4,7 +4,6 @@ import com.shop.phoneshop.domain.*;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
 import com.shop.phoneshop.dto.UserProductDto;
-import com.shop.phoneshop.mappers.CartMapper;
 import com.shop.phoneshop.mappers.CatalogMapper;
 import com.shop.phoneshop.mappers.ProductMapper;
 import com.shop.phoneshop.mappers.UserProductMapper;

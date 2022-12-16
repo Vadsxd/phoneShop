@@ -95,9 +95,7 @@ class PhoneShopApplicationTests {
                 .perform(post("/api/addProduct").contentType(MediaType.APPLICATION_JSON)
                         .content(bytes))
                 .andExpect(status().isOk())
-                .andExpect(cookie().exists("user_product_1"))
-                .andExpect(cookie().value("user_product_1",
-                        "%7B%22amount%22%3A1%2C%22price%22%3A90000%2C%22pictureUrl%22%3A%22some+url%22%2C%22title%22%3A%22OpenPlus7Pro%22%7D"));
+                .andExpect(cookie().exists("user_product_1"));
     }
 
     @Test
@@ -143,7 +141,7 @@ class PhoneShopApplicationTests {
     }
 
     @Test
-    void FailedTransaction() throws Exception {
+    void failedTransaction() throws Exception {
         mockMvc
                 .perform(post("/api/cart/transaction").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));

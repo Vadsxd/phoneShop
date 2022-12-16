@@ -168,7 +168,7 @@ public class CartService {
             User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-            if (userProductRepo.existsByProductTitle(product.getTitle())) {
+            if (userProductRepo.existsByProductTitleAndUser(product.getTitle(), user)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар уже в корзине");
             }
 
