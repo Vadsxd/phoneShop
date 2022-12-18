@@ -147,4 +147,57 @@ class PhoneShopApplicationTests {
                 .andExpect(status().is(400));
     }
 
+
+    @Test
+    void checkAllProductsWithEmptyCartAndNoAuth() throws Exception {
+        int productsCount = productRepo.findAll().size();
+
+        mockMvc
+                .perform(get("/api/catalog").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoryCount").value(productsCount))
+                .andExpect(jsonPath("$.cartCount").value(0));
+    }
+
+    @Test
+    void checkGetProduct() throws Exception {
+        Long productPrice = productRepo.findById(1L).get().getPrice();
+        String productTitle = productRepo.findById(1L).get().getTitle();
+
+        mockMvc.perform(get("/api/catalog/product/{id}", 1).contentType(MediaType.APPLICATION_JSON)
+                .with(authentication(authUser())))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.price").value(productPrice))
+                .andExpect(jsonPath("$.title").value(productTitle));
+    }
+
+    @Test
+    void checkNotExistingUser() throws Exception {
+        String notExistingEmail = "notExistingEmail";
+        AuthRequest request = new AuthRequest();
+        request.setUserEmail(notExistingEmail);
+        request.setUserPassword("123");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] bytes = objectMapper.writeValueAsBytes(request);
+
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content(bytes))
+                .andExpect(status().is(404));
+    }
+
+    @Test
+    void checkDeleteProductFromCart() throws Exception {
+        CartProductRequest request = new CartProductRequest();
+        request.setProductId(3L);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] bytes = objectMapper.writeValueAsBytes(request);
+
+        mockMvc.perform(delete("/api/cart/deleteProduct").contentType(MediaType.APPLICATION_JSON)
+                .content(bytes).with(authentication(authUser())))
+                .andExpect(status().isOk());
+    }
 }
