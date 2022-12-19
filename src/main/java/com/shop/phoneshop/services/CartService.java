@@ -207,6 +207,7 @@ public class CartService {
         }
     }
 
+    //TODO J meter :)
     @Transactional
     public void buyProducts(JwtAuthentication authentication) {
         if (authentication != null) {
@@ -221,6 +222,13 @@ public class CartService {
             for (UserProduct userProduct: userProducts) {
                 Product product = userProduct.getProduct();
                 Long productAmount = product.getAmount();
+                if (productAmount <= 0) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукта " + product.getTitle()
+                            + " нет в наличии");
+                }
+                if (productAmount < userProduct.getAmount()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "В начилии только " + productAmount);
+                }
                 Long productPrice = ProductUtil.getPrice(product, authentication);
                 Long userProductPrice = userProduct.getAmount();
                 fullPrice += productPrice * userProductPrice;
