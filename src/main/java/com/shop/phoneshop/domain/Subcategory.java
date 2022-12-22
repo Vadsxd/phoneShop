@@ -26,6 +26,13 @@ public class Subcategory {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Subcategory subcategory;
+
+    @OneToMany(mappedBy = "subcategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subcategory> subcategories;
+
     @Column(name = "title")
     private String title;
 }
