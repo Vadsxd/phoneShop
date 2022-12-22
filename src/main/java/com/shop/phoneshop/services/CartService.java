@@ -13,6 +13,7 @@ import com.shop.phoneshop.repos.UserRepo;
 import com.shop.phoneshop.requests.AddProductRequest;
 import com.shop.phoneshop.requests.CartProductRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import com.shop.phoneshop.utils.ProductUtil;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,7 @@ public class CartService {
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
             List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
-            List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts);
+            List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts, authentication);
 
             return CartMapper.fromUserProductDtosToCartDto(userProductDtos);
         } else {
@@ -206,6 +207,7 @@ public class CartService {
         }
     }
 
+    //TODO J meter :)
     @Transactional
     public void buyProducts(JwtAuthentication authentication) {
         if (authentication != null) {
@@ -220,7 +222,14 @@ public class CartService {
             for (UserProduct userProduct: userProducts) {
                 Product product = userProduct.getProduct();
                 Long productAmount = product.getAmount();
-                Long productPrice = product.getPrice();
+                if (productAmount <= 0) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукта " + product.getTitle()
+                            + " нет в наличии");
+                }
+                if (productAmount < userProduct.getAmount()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "В начилии только " + productAmount);
+                }
+                Long productPrice = ProductUtil.getPrice(product, authentication);
                 Long userProductPrice = userProduct.getAmount();
                 fullPrice += productPrice * userProductPrice;
                 product.setAmount(productAmount - userProduct.getAmount());

@@ -57,7 +57,7 @@ public class CatalogService {
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
             List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
-            List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts);
+            List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts, authentication);
 
             return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
         } else {
