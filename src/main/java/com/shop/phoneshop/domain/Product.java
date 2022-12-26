@@ -29,6 +29,10 @@ public class Product {
     @JoinColumn(name = "subcategory_id")
     private Subcategory subcategory;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_property_id")
+    private ProductProperty productProperty;
+
     @Column(name = "amount")
     private Long amount;
 
