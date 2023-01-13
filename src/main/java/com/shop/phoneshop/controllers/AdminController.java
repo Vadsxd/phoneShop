@@ -1,0 +1,47 @@
+package com.shop.phoneshop.controllers;
+
+import com.shop.phoneshop.requests.admin.CategoryRequest;
+import com.shop.phoneshop.services.AdminService;
+import com.shop.phoneshop.utils.validation.Marker;
+import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@Api(tags = "Администратор")
+@RestController
+@RequestMapping("/api/admin")
+@PreAuthorize("hasAuthority('ADMIN')")
+public class AdminController {
+    private final AdminService adminService;
+
+    @Autowired
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
+    }
+
+    @Validated(Marker.onCreate.class)
+    @PostMapping("/category")
+    public ResponseEntity<> addCategory(@Valid @RequestBody CategoryRequest request) {
+        adminService.addCategory(request);
+    }
+
+    @DeleteMapping("/deleteProduct/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        adminService.deleteProduct(id);
+    }
+
+    @DeleteMapping("/deleteCategory/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        adminService.deleteCategory(id);
+    }
+
+    @DeleteMapping("/deleteSubcategory/{id}")
+    public void deleteSubcategory(@PathVariable Long id) {
+        adminService.deleteSubcategory(id);
+    }
+}
