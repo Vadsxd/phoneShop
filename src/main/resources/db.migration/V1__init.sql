@@ -2,6 +2,7 @@ alter table if exists refresh_token drop constraint if exists fk_user_id;
 alter table if exists subcategory drop constraint if exists fk_category_id;
 alter table if exists product drop constraint if exists fk_subcategory_id;
 alter table if exists user_product drop constraint if exists fk_product_id;
+alter table if exists user_role drop constraint if exists fk_user_id;
 alter table if exists user_product drop constraint if exists fk_user_id;
 alter table if exists subcategory drop constraint if exists fk_subcategory_id;
 alter table if exists user_feedback drop constraint if exists fk_user_id;
@@ -11,6 +12,7 @@ alter table if exists product_property drop constraint if exists fk_product_id;
 alter table if exists product_property drop constraint if exists fk_property_id;
 
 drop table if exists "user" cascade;
+drop table if exists user_role cascade;
 drop table if exists category cascade;
 drop table if exists refresh_token cascade;
 drop table if exists subcategory cascade;
@@ -28,9 +30,15 @@ create table "user"
     last_name varchar(255) not null,
     email varchar(255) not null,
     password varchar(255) not null,
-    role varchar(255) not null,
     primary key (user_id)
 );
+
+create table user_role
+(
+    user_id bigint not null,
+    role varchar(255) not null
+);
+
 
 create table product
 (
@@ -115,6 +123,7 @@ create table refresh_token
 
 alter table if exists user_product add constraint fk_product_id foreign key (product_id) references product;
 alter table if exists user_product add constraint fk_user_id foreign key (user_id) references "user";
+alter table if exists user_role add constraint fk_user_id foreign key (user_id) references "user";
 alter table if exists subcategory add constraint fk_category_id foreign key (category_id) references category;
 alter table if exists product add constraint fk_subcategory_id foreign key (subcategory_id) references subcategory;
 alter table if exists subcategory add constraint fk_subcategory_id foreign key (parent_id) references subcategory;

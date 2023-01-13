@@ -1,5 +1,6 @@
 package com.shop.phoneshop.security.jwt;
 
+import com.shop.phoneshop.domain.enums.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,10 +16,11 @@ import java.util.Collection;
 public class JwtAuthentication implements Authentication {
     private boolean authenticated;
     private Long userId;
+    private Set<Role> roles;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public Collection<? extends GrantedAuthority> getAuthorities(){
+        return roles;
     }
 
     @Override

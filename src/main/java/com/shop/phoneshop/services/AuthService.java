@@ -2,6 +2,7 @@ package com.shop.phoneshop.services;
 
 import com.shop.phoneshop.domain.RefreshToken;
 import com.shop.phoneshop.domain.User;
+import com.shop.phoneshop.domain.enums.Role;
 import com.shop.phoneshop.dto.JwtResponseDto;
 import com.shop.phoneshop.repos.RefreshTokenRepo;
 import com.shop.phoneshop.repos.UserRepo;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.Set;
 
 @Service
 public class AuthService {
@@ -67,6 +69,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getUserPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
+        user.setRoles(Set.of(Role.USER));
         userRepo.save(user);
 
         return user;
