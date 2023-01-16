@@ -4,12 +4,14 @@ import com.shop.phoneshop.domain.Category;
 import com.shop.phoneshop.domain.Product;
 import com.shop.phoneshop.domain.Subcategory;
 import com.shop.phoneshop.mappers.CategoryMapper;
+import com.shop.phoneshop.mappers.SubcategoryMapper;
 import com.shop.phoneshop.repos.CategoryRepo;
 import com.shop.phoneshop.repos.ProductRepo;
 import com.shop.phoneshop.repos.SubcategoryRepo;
 import com.shop.phoneshop.requests.admin.CategoryRequest;
 import com.shop.phoneshop.requests.admin.MoveSubcategoryRequest;
 import com.shop.phoneshop.requests.admin.MoveSubcategoryToCategoryRequest;
+import com.shop.phoneshop.requests.admin.SubcategoryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,41 @@ public class AdminService {
 
         category.setTitle(request.getTitle());
         categoryRepo.save(category);
+    }
+
+    @Transactional
+    public Subcategory addSubcategory(SubcategoryRequest request) {
+        Long categoryId = request.getId();
+        Long parentId = request.getParentId();
+        Category category = categoryRepo.findById(categoryId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
+
+        Subcategory parentSubcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+
+        Subcategory subcategory = SubcategoryMapper.fromSubcategoryRequestToSubcategory(request, category, parentSubcategory);
+        subcategoryRepo.save(subcategory);
+
+        return subcategory;
+    }
+
+    @Transactional
+    public void updateSubcategory(SubcategoryRequest request) {
+        Long categoryId = request.getId();
+        Long parentId = request.getParentId();
+        Subcategory subcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
+
+        Category category = categoryRepo.findById(categoryId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
+
+        Subcategory parentSubcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+
+        subcategory.setSubcategory(parentSubcategory);
+        subcategory.setCategory(category);
+        subcategory.setTitle(request.getTitle());
+        subcategoryRepo.save(subcategory);
     }
 
     @Transactional
