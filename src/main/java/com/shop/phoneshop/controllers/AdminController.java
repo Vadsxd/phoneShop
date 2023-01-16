@@ -1,5 +1,6 @@
 package com.shop.phoneshop.controllers;
 
+import com.shop.phoneshop.domain.Category;
 import com.shop.phoneshop.requests.admin.CategoryRequest;
 import com.shop.phoneshop.services.AdminService;
 import com.shop.phoneshop.utils.validation.Marker;
@@ -26,8 +27,14 @@ public class AdminController {
 
     @Validated(Marker.onCreate.class)
     @PostMapping("/category")
-    public ResponseEntity<> addCategory(@Valid @RequestBody CategoryRequest request) {
-        adminService.addCategory(request);
+    public ResponseEntity<Category> addCategory(@Valid @RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(adminService.addCategory(request));
+    }
+
+    @Validated(Marker.onUpdate.class)
+    @PutMapping("/category")
+    public void updateCategory(@Valid @RequestBody CategoryRequest request) {
+        adminService.updateCategory(request);
     }
 
     @DeleteMapping("/deleteProduct/{id}")

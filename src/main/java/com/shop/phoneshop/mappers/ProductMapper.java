@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public interface ProductMapper {
     static ProductDto fromProductToDto(Product product, JwtAuthentication authentication) {
         ProductDto productDto = new ProductDto();
+        productDto.setId(productDto.getId());
         productDto.setPictureUrl(product.getPictureUrl());
         productDto.setTitle(product.getTitle());
         productDto.setDescription(product.getDescription());

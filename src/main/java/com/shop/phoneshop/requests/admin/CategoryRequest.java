@@ -16,10 +16,10 @@ import javax.validation.constraints.Null;
 public class CategoryRequest {
     @Null(groups = Marker.onCreate.class)
     @NotNull(groups = Marker.onUpdate.class)
-    @ApiModelProperty("Идентификатор категории. Указывается при редактировании")
+    @ApiModelProperty(value = "Идентификатор категории. Указывается при редактировании", required = true)
     private Long id;
 
     @NotBlank
-    @ApiModelProperty("Название категории")
+    @ApiModelProperty(value = "Название категории", required = true)
     private String title;
 }
