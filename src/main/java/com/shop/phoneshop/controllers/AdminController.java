@@ -2,6 +2,8 @@ package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.domain.Category;
 import com.shop.phoneshop.requests.admin.CategoryRequest;
+import com.shop.phoneshop.requests.admin.MoveSubcategoryRequest;
+import com.shop.phoneshop.requests.admin.MoveSubcategoryToCategoryRequest;
 import com.shop.phoneshop.services.AdminService;
 import com.shop.phoneshop.utils.validation.Marker;
 import io.swagger.annotations.Api;
@@ -35,6 +37,16 @@ public class AdminController {
     @PutMapping("/category")
     public void updateCategory(@Valid @RequestBody CategoryRequest request) {
         adminService.updateCategory(request);
+    }
+
+    @PutMapping("/moveSubcategoryToCategory")
+    public void moveSubcategoryToCategory(@Valid @RequestBody MoveSubcategoryToCategoryRequest request) {
+        adminService.moveSubcategoryToCategory(request);
+    }
+
+    @PutMapping("/moveSubcategory")
+    public void moveSubcategory(@Valid @RequestBody MoveSubcategoryRequest request) {
+        adminService.moveSubcategory(request);
     }
 
     @DeleteMapping("/deleteProduct/{id}")

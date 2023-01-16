@@ -8,6 +8,8 @@ import com.shop.phoneshop.repos.CategoryRepo;
 import com.shop.phoneshop.repos.ProductRepo;
 import com.shop.phoneshop.repos.SubcategoryRepo;
 import com.shop.phoneshop.requests.admin.CategoryRequest;
+import com.shop.phoneshop.requests.admin.MoveSubcategoryRequest;
+import com.shop.phoneshop.requests.admin.MoveSubcategoryToCategoryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,36 @@ public class AdminService {
 
         category.setTitle(request.getTitle());
         categoryRepo.save(category);
+    }
+
+    @Transactional
+    public void moveSubcategoryToCategory(MoveSubcategoryToCategoryRequest request) {
+        Long subId = request.getSubId();
+        Long catId = request.getCatId();
+
+        Subcategory subcategory = subcategoryRepo.findById(subId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
+
+        Category category = categoryRepo.findById(catId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
+
+        subcategory.setCategory(category);
+        subcategoryRepo.save(subcategory);
+    }
+
+    @Transactional
+    public void moveSubcategory(MoveSubcategoryRequest request) {
+        Long id = request.getId();
+        Long destId = request.getDestId();
+
+        Subcategory subcategory = subcategoryRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
+
+        Subcategory destSubcategory = subcategoryRepo.findById(destId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+
+        subcategory.setSubcategory(destSubcategory);
+        subcategoryRepo.save(subcategory);
     }
 
     @Transactional
