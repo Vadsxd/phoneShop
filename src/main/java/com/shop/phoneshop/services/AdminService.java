@@ -54,13 +54,17 @@ public class AdminService {
 
     @Transactional
     public Subcategory addSubcategory(SubcategoryRequest request) {
-        Long categoryId = request.getId();
+        Long categoryId = request.getCategoryId();
         Long parentId = request.getParentId();
+        Subcategory parentSubcategory = null;
+
         Category category = categoryRepo.findById(categoryId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
 
-        Subcategory parentSubcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+        if (parentId != 0) {
+            parentSubcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+        }
 
         Subcategory subcategory = SubcategoryMapper.fromSubcategoryRequestToSubcategory(request, category, parentSubcategory);
         subcategoryRepo.save(subcategory);
@@ -72,14 +76,17 @@ public class AdminService {
     public void updateSubcategory(SubcategoryRequest request) {
         Long categoryId = request.getId();
         Long parentId = request.getParentId();
+        Subcategory parentSubcategory = null;
         Subcategory subcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
         Category category = categoryRepo.findById(categoryId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
 
-        Subcategory parentSubcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+        if (parentId != 0) {
+            parentSubcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
+        }
 
         subcategory.setSubcategory(parentSubcategory);
         subcategory.setCategory(category);
