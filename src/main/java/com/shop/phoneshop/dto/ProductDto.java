@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,4 +27,6 @@ public class ProductDto {
 
     @ApiModelProperty(notes = "Цена на товар", required = true)
     private Long price;
+
+    private List<UserFeedbackDto> userFeedbackDtos;
 }
