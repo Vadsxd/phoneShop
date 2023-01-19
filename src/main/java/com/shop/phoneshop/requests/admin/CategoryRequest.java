@@ -9,6 +9,7 @@ import com.shop.phoneshop.utils.validation.Marker;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -20,6 +21,7 @@ public class CategoryRequest {
     private Long id;
 
     @NotBlank
+    @Size(max = 255)
     @ApiModelProperty(value = "Название категории", required = true)
     private String title;
 }

@@ -1,37 +1,40 @@
 package com.shop.phoneshop.services;
 
-import com.shop.phoneshop.domain.Category;
-import com.shop.phoneshop.domain.Product;
-import com.shop.phoneshop.domain.Subcategory;
+import com.shop.phoneshop.domain.*;
 import com.shop.phoneshop.mappers.CategoryMapper;
+import com.shop.phoneshop.mappers.ProductMapper;
+import com.shop.phoneshop.mappers.ProductPropertyMapper;
 import com.shop.phoneshop.mappers.SubcategoryMapper;
-import com.shop.phoneshop.repos.CategoryRepo;
-import com.shop.phoneshop.repos.ProductRepo;
-import com.shop.phoneshop.repos.SubcategoryRepo;
-import com.shop.phoneshop.requests.admin.CategoryRequest;
-import com.shop.phoneshop.requests.admin.MoveSubcategoryRequest;
-import com.shop.phoneshop.requests.admin.MoveSubcategoryToCategoryRequest;
-import com.shop.phoneshop.requests.admin.SubcategoryRequest;
+import com.shop.phoneshop.repos.*;
+import com.shop.phoneshop.requests.admin.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class AdminService {
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
-    private  final SubcategoryRepo subcategoryRepo;
+    private final SubcategoryRepo subcategoryRepo;
+    private final ProductPropertyRepo productPropertyRepo;
+    private final PropertyRepo propertyRepo;
 
     @Autowired
     public AdminService(ProductRepo productRepo,
                         CategoryRepo categoryRepo,
-                        SubcategoryRepo subcategoryRepo
+                        SubcategoryRepo subcategoryRepo,
+                        ProductPropertyRepo productPropertyRepo,
+                        PropertyRepo propertyRepo
     ) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
         this.subcategoryRepo = subcategoryRepo;
+        this.productPropertyRepo = productPropertyRepo;
+        this.propertyRepo = propertyRepo;
     }
 
     @Transactional
@@ -122,6 +125,45 @@ public class AdminService {
 
         subcategory.setSubcategory(destSubcategory);
         subcategoryRepo.save(subcategory);
+    }
+
+    @Transactional
+    public Product addProduct(ProductRequest request) {
+        Subcategory subcategory = subcategoryRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
+
+        ProductPropertyRequest productPropertyRequest = request.getProductPropertyRequest();
+        List<Property> properties = propertyRepo.findAllById(productPropertyRequest.getPropertyIds());
+        ProductProperty productProperty = ProductPropertyMapper.fromProductPropertyRequestToProductProperty(productPropertyRequest, properties);
+        productPropertyRepo.save(productProperty);
+
+        Product product = ProductMapper.fromProductRequestToProduct(request, productProperty, subcategory);
+        productRepo.save(product);
+
+        return product;
+    }
+
+    @Transactional
+    public void updateProduct(ProductRequest request) {
+        Product product = productRepo.findById(request.getId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        Subcategory subcategory = subcategoryRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
+
+        ProductPropertyRequest productPropertyRequest = request.getProductPropertyRequest();
+        List<Property> properties = propertyRepo.findAllById(productPropertyRequest.getPropertyIds());
+        ProductProperty productProperty = ProductPropertyMapper.fromProductPropertyRequestToProductProperty(productPropertyRequest, properties);
+        productPropertyRepo.save(productProperty);
+
+        product.setProductProperty(productProperty);
+        product.setTitle(request.getTitle());
+        product.setDescription(request.getDescription());
+        product.setAmount(request.getAmount());
+        product.setPrice(request.getPrice());
+        product.setDiscountPrice(request.getDiscountPrice());
+        product.setDiscount(request.getDiscount());
+        productRepo.save(product);
     }
 
     @Transactional

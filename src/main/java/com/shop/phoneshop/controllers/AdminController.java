@@ -1,11 +1,9 @@
 package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.domain.Category;
+import com.shop.phoneshop.domain.Product;
 import com.shop.phoneshop.domain.Subcategory;
-import com.shop.phoneshop.requests.admin.CategoryRequest;
-import com.shop.phoneshop.requests.admin.MoveSubcategoryRequest;
-import com.shop.phoneshop.requests.admin.MoveSubcategoryToCategoryRequest;
-import com.shop.phoneshop.requests.admin.SubcategoryRequest;
+import com.shop.phoneshop.requests.admin.*;
 import com.shop.phoneshop.services.AdminService;
 import com.shop.phoneshop.utils.validation.Marker;
 import io.swagger.annotations.Api;
@@ -61,6 +59,18 @@ public class AdminController {
     @PutMapping("/moveSubcategory")
     public void moveSubcategory(@Valid @RequestBody MoveSubcategoryRequest request) {
         adminService.moveSubcategory(request);
+    }
+
+    @Validated(Marker.onCreate.class)
+    @PostMapping("/product")
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductRequest request) {
+        return ResponseEntity.ok(adminService.addProduct(request));
+    }
+
+    @Validated(Marker.onUpdate.class)
+    @PutMapping("product")
+    public void updateProduct(@Valid @RequestBody ProductRequest request) {
+        adminService.updateProduct(request);
     }
 
     @DeleteMapping("/deleteProduct/{id}")
