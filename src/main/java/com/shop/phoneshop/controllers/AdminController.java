@@ -112,9 +112,15 @@ public class AdminController {
                     """)
     })
     @Validated(Marker.onUpdate.class)
-    @PutMapping("product")
+    @PutMapping("/product")
     public void updateProduct(@Valid @RequestBody ProductRequest request) {
         adminService.updateProduct(request);
+    }
+
+    @ApiOperation("Редактировать характеристики товара")
+    @PostMapping("/product/{id}/updateProperty")
+    public void updateProductProperty(@PathVariable Long id, @Valid @RequestBody PropertyRequest request) {
+        adminService.updateProductProperty(id, request);
     }
 
     @ApiOperation("Удалить товар")

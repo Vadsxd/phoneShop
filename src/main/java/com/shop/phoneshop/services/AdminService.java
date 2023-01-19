@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -164,6 +165,27 @@ public class AdminService {
         product.setDiscountPrice(request.getDiscountPrice());
         product.setDiscount(request.getDiscount());
         productRepo.save(product);
+    }
+
+    // TODO переделать редактирование свойств продукта
+    @Transactional
+    public void updateProductProperty(Long id, PropertyRequest request) {
+        Product product = productRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        ProductProperty productProperty = product.getProductProperty();
+        productProperty.getProperties().stream()
+                .peek(property -> {
+                    property.setId(request.getId());
+                    property.setName(request.getName());
+                    property.setValue(request.getValue());
+                    property.getProductProperty().setId(request.getProductPropertyId());
+                    propertyRepo.save(property);
+                })
+                .collect(Collectors.toList());
+
+        productPropertyRepo.save(productProperty);
+
     }
 
     @Transactional
