@@ -1,7 +1,10 @@
 package com.shop.phoneshop.controllers;
 
+import com.shop.phoneshop.domain.User;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.requests.FeedbackRequest;
+import com.shop.phoneshop.requests.auth.RegisterRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CatalogService;
 import io.swagger.annotations.Api;
@@ -10,10 +13,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Api(tags = "Каталог")
 @RestController
@@ -37,6 +39,29 @@ public class CatalogController {
     @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
     ResponseEntity<ProductDto> getProduct(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProduct(id, authentication));
+    }
+
+    @ApiOperation("Получить товар по id, отзывы упорядочены по возрастанию оценки")
+    @GetMapping("/catalog/product/{id}/sortedAscending")
+    @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
+    ResponseEntity<ProductDto> getProductFeedbacksSortedAscending(@PathVariable Long id, JwtAuthentication authentication) {
+        return ResponseEntity.ok(catalogService.getProductFeedbacksSortedAscending(id, authentication));
+    }
+
+    @ApiOperation("Получить товар по id, отзывы упорядочены по убыванию оценки")
+    @GetMapping("/catalog/product/{id}/sortedDescending")
+    @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
+    ResponseEntity<ProductDto> getProductFeedbacksSortedDescending(@PathVariable Long id, JwtAuthentication authentication) {
+        return ResponseEntity.ok(catalogService.getProductFeedbacksSortedDescending(id, authentication));
+    }
+
+    @ApiOperation("Добавление отзыва")
+    @ApiResponses(@ApiResponse(code = 400, message = "Некорректные данные"))
+    @PostMapping("/catalog/product/{id}/addFeedback")
+    public ResponseEntity<ProductDto> addFeedback(@Valid @RequestBody FeedbackRequest request,
+                                                  JwtAuthentication authentication,
+                                                  @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.addFeedback(request, authentication, id));
     }
 
     @ApiOperation("Получить все товары из категории Смартфоны")

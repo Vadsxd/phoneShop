@@ -10,6 +10,7 @@ import com.shop.phoneshop.mappers.ProductMapper;
 import com.shop.phoneshop.mappers.UserFeedbackMapper;
 import com.shop.phoneshop.mappers.UserProductMapper;
 import com.shop.phoneshop.repos.*;
+import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
+import javax.transaction.Transactional;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CatalogService {
     private final CategoryRepo categoryRepo;
     private final ProductRepo productRepo;
@@ -33,17 +34,22 @@ public class CatalogService {
     private final UserRepo userRepo;
     private final UserProductRepo userProductRepo;
     private final CookieService cookieService;
+    private final UserFeedbackRepo userFeedbackRepo;
+    private final PhotoRepo photoRepo;
 
     @Autowired
     public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo,
                           SubcategoryRepo subcategoryRepo, UserRepo userRepo,
-                          UserProductRepo userProductRepo, CookieService cookieService) {
+                          UserProductRepo userProductRepo, CookieService cookieService,
+                          UserFeedbackRepo userFeedbackRepo, PhotoRepo photoRepo) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
         this.subcategoryRepo = subcategoryRepo;
         this.userRepo = userRepo;
         this.userProductRepo = userProductRepo;
         this.cookieService = cookieService;
+        this.userFeedbackRepo = userFeedbackRepo;
+        this.photoRepo = photoRepo;
     }
 
     public CatalogDto getAllProducts(JwtAuthentication authentication) {
@@ -102,6 +108,60 @@ public class CatalogService {
         List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
 
         return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+    }
+
+    public ProductDto getProductFeedbacksSortedAscending(Long id, JwtAuthentication authentication) {
+        Product product = productRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+        List<UserFeedback> userFeedbacks = product.getUserFeedbacks().stream()
+                .sorted(Comparator.comparingLong(UserFeedback::getFeedback))
+                .toList();
+        List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
+
+        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+    }
+
+    public ProductDto getProductFeedbacksSortedDescending(Long id, JwtAuthentication authentication) {
+        Product product = productRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+        List<UserFeedback> userFeedbacks = product.getUserFeedbacks().stream()
+                .sorted(Comparator.comparingLong(UserFeedback::getFeedback).reversed())
+                .toList();
+        List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
+
+        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+    }
+
+    @Transactional
+    public ProductDto addFeedback(FeedbackRequest request, JwtAuthentication authentication, Long id) {
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+
+            Product product = productRepo.findById(id).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+            UserFeedback userFeedback = new UserFeedback();
+            userFeedback.setUser(user);
+            userFeedback.setComment(request.getComment());
+            userFeedback.setProduct(product);
+            userFeedback.setFeedback(request.getFeedback());
+
+            userFeedbackRepo.save(userFeedback);
+
+            List<Photo> photos = new ArrayList<>();
+            for(String picture: request.getPicturesUrls()) {
+                Photo photo = new Photo();
+                photo.setPictureUrl(picture);
+                photo.setUserFeedback(userFeedback);
+                photoRepo.save(photo);
+                photos.add(photo);
+            }
+            userFeedback.setPhotos(photos);
+            user.getUserFeedbacks().add(userFeedback);
+//            product.getUserFeedbacks().add(userFeedback);
+        }
+        return getProduct(id, authentication);
     }
 
     public CatalogDto getAllProductsFromCategory(String title, JwtAuthentication authentication) {
