@@ -28,5 +28,6 @@ public class ProductDto {
     @ApiModelProperty(notes = "Цена на товар", required = true)
     private Long price;
 
+    @ApiModelProperty(notes = "Отзывы товара", required = true)
     private List<UserFeedbackDto> userFeedbackDtos;
 }

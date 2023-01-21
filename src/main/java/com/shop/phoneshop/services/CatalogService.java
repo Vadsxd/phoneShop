@@ -1,6 +1,7 @@
 package com.shop.phoneshop.services;
 
 import com.shop.phoneshop.domain.*;
+import com.shop.phoneshop.domain.enums.Role;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.UserFeedbackDto;
 import com.shop.phoneshop.dto.ProductDto;
@@ -10,6 +11,7 @@ import com.shop.phoneshop.mappers.ProductMapper;
 import com.shop.phoneshop.mappers.UserFeedbackMapper;
 import com.shop.phoneshop.mappers.UserProductMapper;
 import com.shop.phoneshop.repos.*;
+import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import org.json.JSONObject;
@@ -26,7 +28,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class CatalogService {
     private final CategoryRepo categoryRepo;
     private final ProductRepo productRepo;
@@ -160,6 +161,55 @@ public class CatalogService {
             userFeedback.setPhotos(photos);
             user.getUserFeedbacks().add(userFeedback);
 //            product.getUserFeedbacks().add(userFeedback);
+        }
+        return getProduct(id, authentication);
+    }
+
+    @Transactional
+    public ProductDto deleteFeedback(DeleteFeedbackRequest request, JwtAuthentication authentication, Long id) {
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+            if (!user.getRoles().contains(Role.ADMIN))
+                return getProduct(id, authentication);
+
+            Product product = productRepo.findById(id).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+            UserFeedback userFeedback =
+                    userFeedbackRepo.getById(request.getFeedbackId());
+
+            List<Photo> photos = photoRepo.getAllByUserFeedback(userFeedback);
+            photoRepo.deleteAll(photos);
+
+            userFeedbackRepo.delete(userFeedback);
+
+            user.getUserFeedbacks().remove(userFeedback);
+            product.getUserFeedbacks().remove(userFeedback);
+        }
+        return getProduct(id, authentication);
+    }
+
+    @Transactional
+    public ProductDto deletePhotosFeedback(DeleteFeedbackRequest request, JwtAuthentication authentication, Long id) {
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+            if (!user.getRoles().contains(Role.ADMIN))
+                return getProduct(id, authentication);
+
+            Product product = productRepo.findById(id).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+            UserFeedback userFeedback =
+                    userFeedbackRepo.getById(request.getFeedbackId());
+
+            System.out.println(userFeedback);
+
+            List<Photo> photos = photoRepo.getAllByUserFeedback(userFeedback);
+            photoRepo.deleteAll(photos);
+
+            userFeedback.setPhotos(new ArrayList<>());
         }
         return getProduct(id, authentication);
     }
