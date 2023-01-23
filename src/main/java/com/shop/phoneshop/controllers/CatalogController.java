@@ -83,6 +83,15 @@ public class CatalogController {
         return ResponseEntity.ok(catalogService.deletePhotosFeedback(request, authentication, id));
     }
 
+    @ApiOperation("Удаление фотографий из отзыва")
+    @ApiResponses(@ApiResponse(code = 400, message = "Товар не существует"))
+    @DeleteMapping("/catalog/product/{id}/deleteCommentFeedback")
+    public ResponseEntity<ProductDto> deleteCommentFeedback(@Valid @RequestBody DeleteFeedbackRequest request,
+                                                           JwtAuthentication authentication,
+                                                           @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.deleteCommentFeedback(request, authentication, id));
+    }
+
     @ApiOperation("Получить все товары из категории Смартфоны")
     @GetMapping("/catalog/smartphones")
     @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной категории нет"))

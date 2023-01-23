@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
@@ -15,19 +15,16 @@ import java.util.List;
 @NoArgsConstructor
 public class FeedbackRequest {
     @ApiModelProperty(notes = "Url фотографий в отзыве", required = true)
+    @NotNull
     private List<String> picturesUrls;
+
     @ApiModelProperty(notes = "Комментарий отзыва", required = true)
-    @NotBlank
     private String comment;
+
     @ApiModelProperty(notes = "Оценка в отзыве (от 1 до 5)", required = true)
     @Min(1)
     @Max(5)
+    @NotNull
     private Long feedback;
 
-//    "picturesUrls": [
-//            "kmkcklc",
-//            "pepep"
-//            ],
-//     "comment": "good phone",
-//     "feedback": 5
 }

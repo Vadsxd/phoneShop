@@ -160,7 +160,6 @@ public class CatalogService {
             }
             userFeedback.setPhotos(photos);
             user.getUserFeedbacks().add(userFeedback);
-//            product.getUserFeedbacks().add(userFeedback);
         }
         return getProduct(id, authentication);
     }
@@ -204,12 +203,31 @@ public class CatalogService {
             UserFeedback userFeedback =
                     userFeedbackRepo.getById(request.getFeedbackId());
 
-            System.out.println(userFeedback);
-
             List<Photo> photos = photoRepo.getAllByUserFeedback(userFeedback);
             photoRepo.deleteAll(photos);
 
             userFeedback.setPhotos(new ArrayList<>());
+        }
+        return getProduct(id, authentication);
+    }
+
+    @Transactional
+    public ProductDto deleteCommentFeedback(DeleteFeedbackRequest request, JwtAuthentication authentication, Long id) {
+        if (authentication != null) {
+            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+            if (!user.getRoles().contains(Role.ADMIN))
+                return getProduct(id, authentication);
+
+            Product product = productRepo.findById(id).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+            UserFeedback userFeedback =
+                    userFeedbackRepo.getById(request.getFeedbackId());
+
+            userFeedback.setComment(null);
+
+            userFeedbackRepo.save(userFeedback);
         }
         return getProduct(id, authentication);
     }

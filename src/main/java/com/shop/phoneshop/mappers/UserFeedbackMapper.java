@@ -19,10 +19,8 @@ public interface UserFeedbackMapper {
     }
 
     static List<UserFeedbackDto> fromUserFeedbacksToDtos(List<UserFeedback> userFeedbacks) {
-        List<UserFeedbackDto> result = new ArrayList<>();
-        for(UserFeedback userFeedback: userFeedbacks) {
-            result.add(UserFeedbackMapper.fromUserFeedbackToDto(userFeedback));
-        }
-        return result;
+        return userFeedbacks.stream()
+                .map(UserFeedbackMapper::fromUserFeedbackToDto)
+                .collect(Collectors.toList());
     }
 }
