@@ -3,6 +3,7 @@ package com.shop.phoneshop.controllers;
 import com.shop.phoneshop.domain.Category;
 import com.shop.phoneshop.domain.Product;
 import com.shop.phoneshop.domain.Subcategory;
+import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.admin.*;
 import com.shop.phoneshop.services.AdminService;
 import com.shop.phoneshop.utils.validation.Marker;
@@ -148,5 +149,44 @@ public class AdminController {
     @DeleteMapping("/deleteSubcategory/{id}")
     public void deleteSubcategory(@PathVariable Long id) {
         adminService.deleteSubcategory(id);
+    }
+
+    @ApiOperation("Удаление отзыва полностью")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Товар не существует"),
+            @ApiResponse(code = 404, message = """
+                    Отзыва не существует
+                    Товара не существует
+                    """)
+    })
+    @DeleteMapping("/catalog/product/{id}/deleteFeedback")
+    public void deleteFeedback(@Valid @RequestBody DeleteFeedbackRequest request, @PathVariable Long id) {
+        adminService.deleteFeedback(request, id);
+    }
+
+    @ApiOperation("Удаление фотографий из отзыва")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Товар не существует"),
+            @ApiResponse(code = 404, message = """
+                    Отзыва не существует
+                    Товара не существует
+                    """)
+    })
+    @DeleteMapping("/catalog/product/{id}/deletePhotosFeedback")
+    public void deletePhotosFeedback(@Valid @RequestBody DeleteFeedbackRequest request, @PathVariable Long id) {
+        adminService.deletePhotosFeedback(request, id);
+    }
+
+    @ApiOperation("Удаление комментария из отзыва")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Товар не существует"),
+            @ApiResponse(code = 404, message = """
+                    Отзыва не существует
+                    Товара не существует
+                    """)
+    })
+    @PutMapping("/catalog/product/{id}/deleteCommentFeedback")
+    public void deleteCommentFeedback(@Valid @RequestBody DeleteFeedbackRequest request, @PathVariable Long id) {
+        adminService.deleteCommentFeedback(request, id);
     }
 }

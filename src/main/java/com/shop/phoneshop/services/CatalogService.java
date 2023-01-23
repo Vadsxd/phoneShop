@@ -1,17 +1,15 @@
 package com.shop.phoneshop.services;
 
 import com.shop.phoneshop.domain.*;
-import com.shop.phoneshop.domain.enums.Role;
 import com.shop.phoneshop.dto.CatalogDto;
-import com.shop.phoneshop.dto.UserFeedbackDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.dto.UserFeedbackDto;
 import com.shop.phoneshop.dto.UserProductDto;
 import com.shop.phoneshop.mappers.CatalogMapper;
 import com.shop.phoneshop.mappers.ProductMapper;
 import com.shop.phoneshop.mappers.UserFeedbackMapper;
 import com.shop.phoneshop.mappers.UserProductMapper;
 import com.shop.phoneshop.repos.*;
-import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import org.json.JSONObject;
@@ -24,7 +22,10 @@ import javax.servlet.http.Cookie;
 import javax.transaction.Transactional;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,10 +40,15 @@ public class CatalogService {
     private final PhotoRepo photoRepo;
 
     @Autowired
-    public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo,
-                          SubcategoryRepo subcategoryRepo, UserRepo userRepo,
-                          UserProductRepo userProductRepo, CookieService cookieService,
-                          UserFeedbackRepo userFeedbackRepo, PhotoRepo photoRepo) {
+    public CatalogService(CategoryRepo categoryRepo,
+                          ProductRepo productRepo,
+                          SubcategoryRepo subcategoryRepo,
+                          UserRepo userRepo,
+                          UserProductRepo userProductRepo,
+                          CookieService cookieService,
+                          UserFeedbackRepo userFeedbackRepo,
+                          PhotoRepo photoRepo
+    ) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
         this.subcategoryRepo = subcategoryRepo;
@@ -161,74 +167,7 @@ public class CatalogService {
             userFeedback.setPhotos(photos);
             user.getUserFeedbacks().add(userFeedback);
         }
-        return getProduct(id, authentication);
-    }
 
-    @Transactional
-    public ProductDto deleteFeedback(DeleteFeedbackRequest request, JwtAuthentication authentication, Long id) {
-        if (authentication != null) {
-            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-            if (!user.getRoles().contains(Role.ADMIN))
-                return getProduct(id, authentication);
-
-            Product product = productRepo.findById(id).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
-            UserFeedback userFeedback =
-                    userFeedbackRepo.getById(request.getFeedbackId());
-
-            List<Photo> photos = photoRepo.getAllByUserFeedback(userFeedback);
-            photoRepo.deleteAll(photos);
-
-            userFeedbackRepo.delete(userFeedback);
-
-            user.getUserFeedbacks().remove(userFeedback);
-            product.getUserFeedbacks().remove(userFeedback);
-        }
-        return getProduct(id, authentication);
-    }
-
-    @Transactional
-    public ProductDto deletePhotosFeedback(DeleteFeedbackRequest request, JwtAuthentication authentication, Long id) {
-        if (authentication != null) {
-            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-            if (!user.getRoles().contains(Role.ADMIN))
-                return getProduct(id, authentication);
-
-            Product product = productRepo.findById(id).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
-            UserFeedback userFeedback =
-                    userFeedbackRepo.getById(request.getFeedbackId());
-
-            List<Photo> photos = photoRepo.getAllByUserFeedback(userFeedback);
-            photoRepo.deleteAll(photos);
-
-            userFeedback.setPhotos(new ArrayList<>());
-        }
-        return getProduct(id, authentication);
-    }
-
-    @Transactional
-    public ProductDto deleteCommentFeedback(DeleteFeedbackRequest request, JwtAuthentication authentication, Long id) {
-        if (authentication != null) {
-            User user = userRepo.findById(authentication.getUserId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-            if (!user.getRoles().contains(Role.ADMIN))
-                return getProduct(id, authentication);
-
-            Product product = productRepo.findById(id).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
-
-            UserFeedback userFeedback =
-                    userFeedbackRepo.getById(request.getFeedbackId());
-
-            userFeedback.setComment(null);
-
-            userFeedbackRepo.save(userFeedback);
-        }
         return getProduct(id, authentication);
     }
 
@@ -238,6 +177,7 @@ public class CatalogService {
         List<Product> products = category.getSubcategories().stream()
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
+
         return getCatalogDto(authentication, products);
     }
 
@@ -245,6 +185,7 @@ public class CatalogService {
         Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
+
         return getCatalogDto(authentication, products);
     }
 
@@ -257,6 +198,7 @@ public class CatalogService {
                 .getProducts();
         List<Product> products = new ArrayList<>(headphones);
         products.addAll(covers);
+
         return getCatalogDto(authentication, products);
     }
 }

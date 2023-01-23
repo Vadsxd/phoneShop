@@ -14,17 +14,17 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class FeedbackRequest {
-    @ApiModelProperty(notes = "Url фотографий в отзыве", required = true)
     @NotNull
+    @ApiModelProperty(notes = "Url фотографий в отзыве", required = true)
     private List<String> picturesUrls;
 
     @ApiModelProperty(notes = "Комментарий отзыва", required = true)
     private String comment;
 
-    @ApiModelProperty(notes = "Оценка в отзыве (от 1 до 5)", required = true)
+    @NotNull
     @Min(1)
     @Max(5)
-    @NotNull
+    @ApiModelProperty(notes = "Оценка в отзыве (от 1 до 5)", required = true)
     private Long feedback;
 
 }
