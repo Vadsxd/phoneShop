@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserFeedbackDto {
-    @ApiModelProperty(notes = "Ссылки на картинки для отзыва")
+    @ApiModelProperty(notes = "Ссылки на картинки для отзыва", required = true)
     private List<String> picturesUrls;
 
     @ApiModelProperty(notes = "Комментарий отзыва (null, если комментария нет)")

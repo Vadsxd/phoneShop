@@ -83,9 +83,9 @@ public class CatalogController {
         return ResponseEntity.ok(catalogService.deletePhotosFeedback(request, authentication, id));
     }
 
-    @ApiOperation("Удаление фотографий из отзыва")
+    @ApiOperation("Удаление комментария из отзыва")
     @ApiResponses(@ApiResponse(code = 400, message = "Товар не существует"))
-    @DeleteMapping("/catalog/product/{id}/deleteCommentFeedback")
+    @PutMapping("/catalog/product/{id}/deleteCommentFeedback")
     public ResponseEntity<ProductDto> deleteCommentFeedback(@Valid @RequestBody DeleteFeedbackRequest request,
                                                            JwtAuthentication authentication,
                                                            @PathVariable Long id) {
