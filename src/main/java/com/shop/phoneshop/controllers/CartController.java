@@ -28,7 +28,7 @@ public class CartController {
 
     @ApiOperation("Получить товары, добавленные в корзину")
     @GetMapping("/cart")
-    ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication) {
+    public ResponseEntity<CartDto> getCartProducts(JwtAuthentication authentication) {
         return ResponseEntity.ok(cartService.getUserProducts(authentication));
     }
 

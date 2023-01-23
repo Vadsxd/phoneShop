@@ -12,6 +12,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ProductDto {
+    @ApiModelProperty(notes = "ID продукта", required = true)
+    private Long id;
+
     @ApiModelProperty(notes = "Ссылка на картинку для товара", required = true)
     private String pictureUrl;
 

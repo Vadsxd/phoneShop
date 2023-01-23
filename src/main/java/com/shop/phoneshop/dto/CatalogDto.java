@@ -11,12 +11,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class CatalogDto {
-    @ApiModelProperty(notes = "Продукты в каталоге", required = true)
-    List<ProductDto> productDtos;
+    @ApiModelProperty(notes = "Список товаров", required = true)
+    private List<ProductDto> productDtos;
 
-    @ApiModelProperty(notes = "Количество товаров в категории", required = true)
+    @ApiModelProperty(notes = "Количество товаров в данной категории/подкатегории", required = true)
     private Long categoryCount;
 
-    @ApiModelProperty(notes = "Количество товаров в корзине", required = true)
+    @ApiModelProperty(notes = "Количество товаров, добавленных в корзину", required = true)
     private Long cartCount;
 }
