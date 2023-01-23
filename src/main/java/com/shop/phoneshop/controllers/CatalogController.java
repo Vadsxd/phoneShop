@@ -1,7 +1,11 @@
 package com.shop.phoneshop.controllers;
 
+import com.shop.phoneshop.domain.User;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.requests.DeleteFeedbackRequest;
+import com.shop.phoneshop.requests.FeedbackRequest;
+import com.shop.phoneshop.requests.auth.RegisterRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CatalogService;
 import io.swagger.annotations.Api;
@@ -10,10 +14,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Api(tags = "Каталог")
 @RestController
@@ -37,6 +40,56 @@ public class CatalogController {
     @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
     public ResponseEntity<ProductDto> getProduct(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProduct(id, authentication));
+    }
+
+    @ApiOperation("Получить товар по id, отзывы упорядочены по возрастанию оценки")
+    @GetMapping("/catalog/product/{id}/sortedAscending")
+    @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
+    ResponseEntity<ProductDto> getProductFeedbacksSortedAscending(@PathVariable Long id, JwtAuthentication authentication) {
+        return ResponseEntity.ok(catalogService.getProductFeedbacksSortedAscending(id, authentication));
+    }
+
+    @ApiOperation("Получить товар по id, отзывы упорядочены по убыванию оценки")
+    @GetMapping("/catalog/product/{id}/sortedDescending")
+    @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
+    ResponseEntity<ProductDto> getProductFeedbacksSortedDescending(@PathVariable Long id, JwtAuthentication authentication) {
+        return ResponseEntity.ok(catalogService.getProductFeedbacksSortedDescending(id, authentication));
+    }
+
+    @ApiOperation("Добавление отзыва")
+    @ApiResponses(@ApiResponse(code = 400, message = "Некорректные данные"))
+    @PostMapping("/catalog/product/{id}/addFeedback")
+    public ResponseEntity<ProductDto> addFeedback(@Valid @RequestBody FeedbackRequest request,
+                                                  JwtAuthentication authentication,
+                                                  @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.addFeedback(request, authentication, id));
+    }
+
+    @ApiOperation("Удаление отзыва полностью")
+    @ApiResponses(@ApiResponse(code = 400, message = "Товар не существует"))
+    @DeleteMapping("/catalog/product/{id}/deleteFeedback")
+    public ResponseEntity<ProductDto> deleteFeedback(@Valid @RequestBody DeleteFeedbackRequest request,
+                                                     JwtAuthentication authentication,
+                                                     @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.deleteFeedback(request, authentication, id));
+    }
+
+    @ApiOperation("Удаление фотографий из отзыва")
+    @ApiResponses(@ApiResponse(code = 400, message = "Товар не существует"))
+    @DeleteMapping("/catalog/product/{id}/deletePhotosFeedback")
+    public ResponseEntity<ProductDto> deletePhotosFeedback(@Valid @RequestBody DeleteFeedbackRequest request,
+                                                     JwtAuthentication authentication,
+                                                     @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.deletePhotosFeedback(request, authentication, id));
+    }
+
+    @ApiOperation("Удаление комментария из отзыва")
+    @ApiResponses(@ApiResponse(code = 400, message = "Товар не существует"))
+    @PutMapping("/catalog/product/{id}/deleteCommentFeedback")
+    public ResponseEntity<ProductDto> deleteCommentFeedback(@Valid @RequestBody DeleteFeedbackRequest request,
+                                                           JwtAuthentication authentication,
+                                                           @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.deleteCommentFeedback(request, authentication, id));
     }
 
     @ApiOperation("Получить все товары из категории Смартфоны")

@@ -50,4 +50,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<UserProduct> userProducts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<UserFeedback> userFeedbacks = new ArrayList<>();
 }
