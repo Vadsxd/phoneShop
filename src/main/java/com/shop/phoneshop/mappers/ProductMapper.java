@@ -34,6 +34,8 @@ public interface ProductMapper {
         Product product = new Product();
         product.setId(request.getId());
         product.setProductProperty(productProperty);
+        product.setPictureUrl(request.getPictureUrl());
+        product.setSubcategory(subcategory);
         product.setTitle(request.getTitle());
         product.setDescription(request.getDescription());
         product.setAmount(request.getAmount());

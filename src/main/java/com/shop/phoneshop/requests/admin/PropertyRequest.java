@@ -23,8 +23,4 @@ public class PropertyRequest {
     @NotBlank
     @ApiModelProperty(value = "Значение свойства", required = true)
     private String value;
-
-    @NotNull
-    @ApiModelProperty(value = "ID к какому продукту относится", required = true)
-    private Long productPropertyId;
 }

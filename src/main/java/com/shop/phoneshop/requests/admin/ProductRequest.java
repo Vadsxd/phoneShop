@@ -31,6 +31,7 @@ public class ProductRequest {
     private String title;
 
     @NotBlank
+    @Size(max = 500)
     @ApiModelProperty(value = "Описание продукта", required = true)
     private String description;
 

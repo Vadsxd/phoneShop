@@ -26,6 +26,7 @@ public class JwtResponseDto {
 
     @ApiModelProperty(notes = "Когда Refresh токен истекает", required = true)
     private Instant refreshExpiresIn;
+
     public JwtResponseDto(TokenResponse access, TokenResponse refresh) {
         accessToken = access.getToken();
         accessExpiresIn = access.getExpiresIn();

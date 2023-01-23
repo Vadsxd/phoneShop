@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CartDto {
     @ApiModelProperty(notes = "Список товаров в корзине", required = true)
-    List<UserProductDto> userProductDtos;
+    private List<UserProductDto> userProductDtos;
 
     @ApiModelProperty(notes = "Количество товаров в корзине", required = true)
     private Long count;
