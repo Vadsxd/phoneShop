@@ -33,9 +33,13 @@ public class CatalogService {
     private final CookieService cookieService;
 
     @Autowired
-    public CatalogService(CategoryRepo categoryRepo, ProductRepo productRepo,
-                          SubcategoryRepo subcategoryRepo, UserRepo userRepo,
-                          UserProductRepo userProductRepo, CookieService cookieService) {
+    public CatalogService(CategoryRepo categoryRepo,
+                          ProductRepo productRepo,
+                          SubcategoryRepo subcategoryRepo,
+                          UserRepo userRepo,
+                          UserProductRepo userProductRepo,
+                          CookieService cookieService
+    ) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
         this.subcategoryRepo = subcategoryRepo;
