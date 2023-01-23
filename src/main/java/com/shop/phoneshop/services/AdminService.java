@@ -6,6 +6,7 @@ import com.shop.phoneshop.mappers.ProductMapper;
 import com.shop.phoneshop.mappers.ProductPropertyMapper;
 import com.shop.phoneshop.mappers.SubcategoryMapper;
 import com.shop.phoneshop.repos.*;
+import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.admin.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,19 +23,25 @@ public class AdminService {
     private final SubcategoryRepo subcategoryRepo;
     private final ProductPropertyRepo productPropertyRepo;
     private final PropertyRepo propertyRepo;
+    private final PhotoRepo photoRepo;
+    private final UserFeedbackRepo userFeedbackRepo;
 
     @Autowired
     public AdminService(ProductRepo productRepo,
                         CategoryRepo categoryRepo,
                         SubcategoryRepo subcategoryRepo,
                         ProductPropertyRepo productPropertyRepo,
-                        PropertyRepo propertyRepo
+                        PropertyRepo propertyRepo,
+                        PhotoRepo photoRepo,
+                        UserFeedbackRepo userFeedbackRepo
     ) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
         this.subcategoryRepo = subcategoryRepo;
         this.productPropertyRepo = productPropertyRepo;
         this.propertyRepo = propertyRepo;
+        this.photoRepo = photoRepo;
+        this.userFeedbackRepo = userFeedbackRepo;
     }
 
     @Transactional
@@ -204,5 +211,41 @@ public class AdminService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
         subcategoryRepo.delete(subcategory);
+    }
+
+    @Transactional
+    public void deleteFeedback(DeleteFeedbackRequest request, Long id) {
+        productRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        UserFeedback userFeedback = userFeedbackRepo.findById(request.getFeedbackId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Отзыв не найден"));
+
+        userFeedbackRepo.delete(userFeedback);
+    }
+
+    @Transactional
+    public void deletePhotosFeedback(DeleteFeedbackRequest request, Long id) {
+        productRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        UserFeedback userFeedback = userFeedbackRepo.findById(request.getFeedbackId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Отзыв не найден"));
+
+        List<Photo> photos = photoRepo.getAllByUserFeedback(userFeedback);
+        photoRepo.deleteAll(photos);
+    }
+
+    @Transactional
+    public void deleteCommentFeedback(DeleteFeedbackRequest request, Long id) {
+        productRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
+
+        UserFeedback userFeedback = userFeedbackRepo.findById(request.getFeedbackId()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Отзыв не найден"));
+
+        userFeedback.setComment(null);
+
+        userFeedbackRepo.save(userFeedback);
     }
 }

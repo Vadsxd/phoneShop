@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor
 public class DeleteFeedbackRequest {
-    @ApiModelProperty(notes = "Id отзыва на сайте", required = true)
     @NotNull
+    @ApiModelProperty(notes = "Id отзыва на сайте", required = true)
     private Long feedbackId;
 }
