@@ -117,8 +117,14 @@ public class AdminController {
         adminService.updateProduct(request);
     }
 
-    @ApiOperation("Редактировать характеристики товара")
-    @PostMapping("/product/{id}/updateProperty")
+    @ApiOperation("Редактировать характеристику товара")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = """
+                    Свойства не существует
+                    Товара не существует
+                    """)
+    })
+    @PutMapping("/product/{id}/updateProperty")
     public void updateProductProperty(@PathVariable Long id, @Valid @RequestBody PropertyRequest request) {
         adminService.updateProductProperty(id, request);
     }
