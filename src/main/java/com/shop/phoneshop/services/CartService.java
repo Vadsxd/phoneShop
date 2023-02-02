@@ -269,8 +269,15 @@ public class CartService {
                 Product product = productRepo.findById(productId).orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
                 Long productAmount = product.getAmount();
+                if (productAmount <= 0) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Продукта " + product.getTitle()
+                            + " нет в наличии");
+                }
                 JSONObject json = new JSONObject(URLDecoder.decode(sortCookie.getValue(), StandardCharsets.UTF_8));
                 long cookieValue = ((Number) json.get("amount")).longValue();
+                if (productAmount < cookieValue) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "В начилии только " + productAmount);
+                }
                 product.setAmount(productAmount - cookieValue);
                 productRepo.save(product);
                 cookieService.deleteCookie(sortCookie.getName());
