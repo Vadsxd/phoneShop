@@ -28,10 +28,10 @@ public class Subcategory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private Subcategory subcategory;
+    private Subcategory parentSubcategory;
 
-    @OneToMany(mappedBy = "subcategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subcategory> subcategories;
+    @OneToMany(mappedBy = "parentSubcategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subcategory> childSubcategories;
 
     @Column(name = "title")
     private String title;

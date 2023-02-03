@@ -171,9 +171,9 @@ public class CatalogService {
         return getProduct(id, authentication);
     }
 
-    public CatalogDto getAllProductsFromCategory(String title, JwtAuthentication authentication) {
-        Category category = categoryRepo.findByTitle(title).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной категории не найдены"));
+    public CatalogDto getAllProductsFromCategory(Long id, JwtAuthentication authentication) {
+        Category category = categoryRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
         List<Product> products = category.getSubcategories().stream()
                 .flatMap(s -> s.getProducts().stream())
                 .collect(Collectors.toList());
@@ -181,23 +181,11 @@ public class CatalogService {
         return getCatalogDto(authentication, products);
     }
 
-    public CatalogDto getAllProductsFromSubcategory(String title, JwtAuthentication authentication) {
-        Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
+    // TODO обход по дереву и достаем продукты
+    public CatalogDto getAllProductsFromSubcategory(Long id, JwtAuthentication authentication) {
+        Subcategory subcategory = subcategoryRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
-
-        return getCatalogDto(authentication, products);
-    }
-
-    public CatalogDto getSmartphonesExtraProducts(JwtAuthentication authentication) {
-        List<Product> headphones = subcategoryRepo.findByTitle("Headphones").orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
-                .getProducts();
-        List<Product> covers = subcategoryRepo.findByTitle("SmartphoneCovers").orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
-                .getProducts();
-        List<Product> products = new ArrayList<>(headphones);
-        products.addAll(covers);
 
         return getCatalogDto(authentication, products);
     }

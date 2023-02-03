@@ -98,7 +98,7 @@ public class AdminService {
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
         }
 
-        subcategory.setSubcategory(parentSubcategory);
+        subcategory.setParentSubcategory(parentSubcategory);
         subcategory.setCategory(category);
         subcategory.setTitle(request.getTitle());
         subcategoryRepo.save(subcategory);
@@ -130,7 +130,7 @@ public class AdminService {
         Subcategory destSubcategory = subcategoryRepo.findById(destId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной родительской подкатегории не существует"));
 
-        subcategory.setSubcategory(destSubcategory);
+        subcategory.setParentSubcategory(destSubcategory);
         subcategoryRepo.save(subcategory);
     }
 

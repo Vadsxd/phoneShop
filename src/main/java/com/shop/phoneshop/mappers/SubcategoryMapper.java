@@ -9,7 +9,7 @@ public interface SubcategoryMapper {
         Subcategory subcategory = new Subcategory();
         subcategory.setId(request.getId());
         subcategory.setCategory(category);
-        subcategory.setSubcategory(parentSubcategory);
+        subcategory.setParentSubcategory(parentSubcategory);
         subcategory.setTitle(request.getTitle());
 
         return subcategory;
