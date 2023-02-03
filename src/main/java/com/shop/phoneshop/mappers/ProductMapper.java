@@ -10,13 +10,12 @@ import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.utils.ProductUtil;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface ProductMapper {
     static ProductDto fromProductToDto(Product product, JwtAuthentication authentication,
                                        List<UserFeedbackDto> userFeedbackDtos) {
         ProductDto productDto = new ProductDto();
-        productDto.setId(productDto.getId());
+        productDto.setId(product.getId());
         productDto.setPictureUrl(product.getPictureUrl());
         productDto.setTitle(product.getTitle());
         productDto.setDescription(product.getDescription());

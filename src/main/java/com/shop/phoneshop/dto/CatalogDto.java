@@ -11,6 +11,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class CatalogDto {
+    @ApiModelProperty(notes = "Инициалы пользователя (null, если пользователь не авторизован)")
+    private String initials;
+
     @ApiModelProperty(notes = "Список товаров", required = true)
     private List<ProductDto> productDtos;
 

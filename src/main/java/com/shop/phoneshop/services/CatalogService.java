@@ -80,13 +80,13 @@ public class CatalogService {
             List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
             List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts, authentication);
 
-            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos, user);
         } else {
             Cookie[] cookies = cookieService.getAllCookies();
             List<UserProductDto> userProductDtos = new ArrayList<>();
 
             if (cookies == null) {
-                return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+                return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos, null);
             }
 
             List<String> values = Arrays.stream(cookies)
@@ -104,7 +104,7 @@ public class CatalogService {
                 userProductDtos.add(dto);
             }
 
-            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos, null);
         }
     }
 
