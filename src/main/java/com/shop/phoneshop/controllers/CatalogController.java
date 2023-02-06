@@ -42,14 +42,14 @@ public class CatalogController {
     @ApiOperation("Получить товар по id, отзывы упорядочены по возрастанию оценки")
     @GetMapping("/catalog/product/{id}/sortedAscending")
     @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
-    ResponseEntity<ProductDto> getProductFeedbacksSortedAscending(@PathVariable Long id, JwtAuthentication authentication) {
+    public ResponseEntity<ProductDto> getProductFeedbacksSortedAscending(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProductFeedbacksSortedAscending(id, authentication));
     }
 
     @ApiOperation("Получить товар по id, отзывы упорядочены по убыванию оценки")
     @GetMapping("/catalog/product/{id}/sortedDescending")
     @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
-    ResponseEntity<ProductDto> getProductFeedbacksSortedDescending(@PathVariable Long id, JwtAuthentication authentication) {
+    public ResponseEntity<ProductDto> getProductFeedbacksSortedDescending(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProductFeedbacksSortedDescending(id, authentication));
     }
 
