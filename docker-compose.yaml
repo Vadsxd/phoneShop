@@ -6,13 +6,15 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8080:8080"
     depends_on:
       - postgresql
     environment:
       DB_URL: postgresql://postgresql:5432/postgres
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
       - /var/log/phone_shop:/logs
 

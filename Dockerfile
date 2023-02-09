@@ -1,3 +1,3 @@
 FROM openjdk:18-alpine
-COPY build/libs/*.jar phoneShop.jar
-ENTRYPOINT ["java", "-jar", "/phoneShop.jar"]
+COPY build/libs/*.jar application.jar
+ENTRYPOINT ["java", "-jar", "application.jar"]
