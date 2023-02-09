@@ -12,6 +12,7 @@ import com.shop.phoneshop.mappers.UserProductMapper;
 import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import com.shop.phoneshop.utils.CatalogUtil;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -174,18 +175,17 @@ public class CatalogService {
     public CatalogDto getAllProductsFromCategory(Long id, JwtAuthentication authentication) {
         Category category = categoryRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
-        List<Product> products = category.getSubcategories().stream()
-                .flatMap(s -> s.getProducts().stream())
-                .collect(Collectors.toList());
+        List<Product> products = new ArrayList<>();
+        CatalogUtil.getProductsFromSubcategoryAndChilds(products, category.getSubcategories());
 
         return getCatalogDto(authentication, products);
     }
 
-    // TODO обход по дереву и достаем продукты
     public CatalogDto getAllProductsFromSubcategory(Long id, JwtAuthentication authentication) {
         Subcategory subcategory = subcategoryRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
+        CatalogUtil.getProductsFromSubcategoryAndChilds(products, subcategory.getChildSubcategories());
 
         return getCatalogDto(authentication, products);
     }
