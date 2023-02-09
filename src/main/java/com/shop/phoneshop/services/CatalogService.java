@@ -12,6 +12,7 @@ import com.shop.phoneshop.mappers.UserProductMapper;
 import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
+import com.shop.phoneshop.utils.CatalogUtil;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -80,13 +81,13 @@ public class CatalogService {
             List<UserProduct> userProducts = userProductRepo.findAllByUser(user);
             List<UserProductDto> userProductDtos = UserProductMapper.fromUserProductsToDtos(userProducts, authentication);
 
-            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos, user);
         } else {
             Cookie[] cookies = cookieService.getAllCookies();
             List<UserProductDto> userProductDtos = new ArrayList<>();
 
             if (cookies == null) {
-                return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+                return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos, null);
             }
 
             List<String> values = Arrays.stream(cookies)
@@ -104,7 +105,7 @@ public class CatalogService {
                 userProductDtos.add(dto);
             }
 
-            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos);
+            return CatalogMapper.fromProductDtosToCatalogDto(productDtos, userProductDtos, null);
         }
     }
 
@@ -171,33 +172,20 @@ public class CatalogService {
         return getProduct(id, authentication);
     }
 
-    public CatalogDto getAllProductsFromCategory(String title, JwtAuthentication authentication) {
-        Category category = categoryRepo.findByTitle(title).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной категории не найдены"));
-        List<Product> products = category.getSubcategories().stream()
-                .flatMap(s -> s.getProducts().stream())
-                .collect(Collectors.toList());
+    public CatalogDto getAllProductsFromCategory(Long id, JwtAuthentication authentication) {
+        Category category = categoryRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной категории не существует"));
+        List<Product> products = new ArrayList<>();
+        CatalogUtil.getProductsFromSubcategoryAndChilds(products, category.getSubcategories());
 
         return getCatalogDto(authentication, products);
     }
 
-    public CatalogDto getAllProductsFromSubcategory(String title, JwtAuthentication authentication) {
-        Subcategory subcategory = subcategoryRepo.findByTitle(title).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"));
+    public CatalogDto getAllProductsFromSubcategory(Long id, JwtAuthentication authentication) {
+        Subcategory subcategory = subcategoryRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
         List<Product> products = new ArrayList<>(subcategory.getProducts());
-
-        return getCatalogDto(authentication, products);
-    }
-
-    public CatalogDto getSmartphonesExtraProducts(JwtAuthentication authentication) {
-        List<Product> headphones = subcategoryRepo.findByTitle("Headphones").orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
-                .getProducts();
-        List<Product> covers = subcategoryRepo.findByTitle("SmartphoneCovers").orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Товары из данной подкатегории не найдены"))
-                .getProducts();
-        List<Product> products = new ArrayList<>(headphones);
-        products.addAll(covers);
+        CatalogUtil.getProductsFromSubcategoryAndChilds(products, subcategory.getChildSubcategories());
 
         return getCatalogDto(authentication, products);
     }

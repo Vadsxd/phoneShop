@@ -42,14 +42,14 @@ public class CatalogController {
     @ApiOperation("Получить товар по id, отзывы упорядочены по возрастанию оценки")
     @GetMapping("/catalog/product/{id}/sortedAscending")
     @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
-    ResponseEntity<ProductDto> getProductFeedbacksSortedAscending(@PathVariable Long id, JwtAuthentication authentication) {
+    public ResponseEntity<ProductDto> getProductFeedbacksSortedAscending(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProductFeedbacksSortedAscending(id, authentication));
     }
 
     @ApiOperation("Получить товар по id, отзывы упорядочены по убыванию оценки")
     @GetMapping("/catalog/product/{id}/sortedDescending")
     @ApiResponses(@ApiResponse(code = 404, message = "Товар не существует"))
-    ResponseEntity<ProductDto> getProductFeedbacksSortedDescending(@PathVariable Long id, JwtAuthentication authentication) {
+    public ResponseEntity<ProductDto> getProductFeedbacksSortedDescending(@PathVariable Long id, JwtAuthentication authentication) {
         return ResponseEntity.ok(catalogService.getProductFeedbacksSortedDescending(id, authentication));
     }
 
@@ -62,52 +62,19 @@ public class CatalogController {
         return ResponseEntity.ok(catalogService.addFeedback(request, authentication, id));
     }
 
-    @ApiOperation("Получить все товары из категории Смартфоны")
-    @GetMapping("/catalog/smartphones")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной категории нет"))
-    public ResponseEntity<CatalogDto> getSmartphones(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllProductsFromCategory("Smartphones", authentication));
+    @ApiOperation("Получить все товары из категории")
+    @GetMapping("/catalog/category/{id}")
+    @ApiResponses(@ApiResponse(code = 404, message = "Данной категории не существует"))
+    public ResponseEntity<CatalogDto> getSmartphones(JwtAuthentication authentication,
+                                                     @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.getAllProductsFromCategory(id, authentication));
     }
 
-    @ApiOperation("Получить все товары из категории Аудиотехника")
-    @GetMapping("/catalog/audioTechs")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной категории нет"))
-    public ResponseEntity<CatalogDto> getAudioTechnics(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllProductsFromCategory("AudioTechnics", authentication));
-    }
-
-    @ApiOperation("Получить все товары из подкатегории Портативные колонки")
-    @GetMapping("/catalog/audioTechs/portableSpeakers")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной подкатегории нет"))
-    public ResponseEntity<CatalogDto> getPortableSpeakers(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("PortableSpeakers", authentication));
-    }
-
-    @ApiOperation("Получить все товары из подкатегории Наушники")
-    @GetMapping("/catalog/audioTechs/headphones")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной подкатегории нет"))
-    public ResponseEntity<CatalogDto> getHeadphones(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("Headphones", authentication));
-    }
-
-    @ApiOperation("Получить все товары из подкатегории Apple")
-    @GetMapping("/catalog/smartphones/apple")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной подкатегории нет"))
-    public ResponseEntity<CatalogDto> getAppleSmartphones(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("Apple", authentication));
-    }
-
-    @ApiOperation("Получить все товары из подкатегории OnePlus")
-    @GetMapping("/catalog/smartphones/onePlus")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной подкатегории нет"))
-    public ResponseEntity<CatalogDto> getOnePlusSmartphones(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory("OnePlus", authentication));
-    }
-
-    @ApiOperation("Получить все товары из подкатегории Дополнительные товары для смартфонов")
-    @GetMapping("/catalog/smartphones/extraProducts")
-    @ApiResponses(@ApiResponse(code = 404, message = "Товаров из данной подкатегории нет"))
-    public ResponseEntity<CatalogDto> getSmartphonesExtraProducts(JwtAuthentication authentication) {
-        return ResponseEntity.ok(catalogService.getSmartphonesExtraProducts(authentication));
+    @ApiOperation("Получить все товары из подкатегории")
+    @GetMapping("/catalog/subcategory/{id}")
+    @ApiResponses(@ApiResponse(code = 404, message = "Данной подкатегории не существует"))
+    public ResponseEntity<CatalogDto> getPortableSpeakers(JwtAuthentication authentication,
+                                                          @PathVariable Long id) {
+        return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory(id, authentication));
     }
 }
