@@ -35,5 +35,7 @@
 ## Подробная инструкция:
 + git clone https://github.com/Vadsxd/phoneShop.git
 + cd phoneShop
++ запускаем Докер
++ включаем БД
 + заполняем файл .env (смотрите на мой пример, у вас он может быть другой)
 + docker-compose up -d
