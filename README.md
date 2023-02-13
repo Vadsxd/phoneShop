@@ -27,7 +27,13 @@
 ## Docker
 Для Docker Compose можно использовать конфигурацию с помощью `.env` файла.
 
-См. пример `.env.example`
+См. пример `.env`
 
 Запустить контейнер:
++ docker-compose up -d
+
+## Подробная инструкция:
++ git clone https://github.com/Vadsxd/phoneShop.git
++ cd phoneShop
++ заполняем файл .env (смотрите на мой пример, у вас он может быть другой)
 + docker-compose up -d
