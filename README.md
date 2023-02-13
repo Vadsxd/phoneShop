@@ -33,6 +33,7 @@
 + docker-compose up -d
 
 ## Подробная инструкция:
++ открываем терминал
 + git clone https://github.com/Vadsxd/phoneShop.git
 + cd phoneShop
 + запускаем Докер
