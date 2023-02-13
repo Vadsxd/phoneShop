@@ -6,23 +6,17 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8080:8080"
     depends_on:
       - postgresql
-    environment:
-      DB_URL: postgresql://postgresql:5432/postgres
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - /var/log/phone_shop:/logs
+    env_file:
+      - .env
 
   postgresql:
     container_name: phone_shop_db
-    image: "postgres:14.2"
+    image: "postgres:15.0"
     restart: always
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: phone_shop_db
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
