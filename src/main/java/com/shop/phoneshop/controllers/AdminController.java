@@ -2,6 +2,7 @@ package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.domain.Category;
 import com.shop.phoneshop.domain.Product;
+import com.shop.phoneshop.domain.Property;
 import com.shop.phoneshop.domain.Subcategory;
 import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.admin.*;
@@ -116,6 +117,27 @@ public class AdminController {
     @PutMapping("/product")
     public void updateProduct(@Valid @RequestBody ProductRequest request) {
         adminService.updateProduct(request);
+    }
+
+    @ApiOperation("Добавить характеристику")
+    @ApiResponses(@ApiResponse(code = 404, message = "Неверный id набора свойств"))
+    @Validated(Marker.onCreate.class)
+    @PostMapping("/property")
+    public ResponseEntity<Property> addProperty(@Valid @RequestBody AddPropertyRequest request) {
+        return ResponseEntity.ok(adminService.addProperty(request));
+    }
+
+    @ApiOperation("Редактировать характеристику")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = """
+                    Неверный id набора свойств
+                    Свойства не существует
+                    """)
+    })
+    @Validated(Marker.onUpdate.class)
+    @PutMapping("/property")
+    public void updateProperty(@Valid @RequestBody AddPropertyRequest request) {
+        adminService.updateProperty(request);
     }
 
     @ApiOperation("Редактировать характеристику товара")

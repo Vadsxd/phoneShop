@@ -1,5 +1,6 @@
 package com.shop.phoneshop.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class Subcategory {
     @OneToMany(mappedBy = "subcategory", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
