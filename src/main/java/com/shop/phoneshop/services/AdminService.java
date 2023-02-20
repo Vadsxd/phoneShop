@@ -84,10 +84,11 @@ public class AdminService {
 
     @Transactional
     public void updateSubcategory(SubcategoryRequest request) {
-        Long categoryId = request.getId();
+        Long categoryId = request.getCategoryId();
         Long parentId = request.getParentId();
         Subcategory parentSubcategory = null;
-        Subcategory subcategory = subcategoryRepo.findById(parentId).orElseThrow(() ->
+
+        Subcategory subcategory = subcategoryRepo.findById(request.getId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
         Category category = categoryRepo.findById(categoryId).orElseThrow(() ->
@@ -174,6 +175,35 @@ public class AdminService {
         product.setDiscount(request.getDiscount());
 
         productRepo.save(product);
+    }
+
+    @Transactional
+    public Property addProperty(AddPropertyRequest request) {
+        Property property = new Property();
+
+        ProductProperty productProperty = productPropertyRepo.findById(request.getProdPropId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Неверный id набора свойств"));
+
+        property.setName(request.getName());
+        property.setValue(request.getValue());
+        property.setProductProperty(productProperty);
+        propertyRepo.save(property);
+
+        return property;
+    }
+
+    @Transactional
+    public void updateProperty(AddPropertyRequest request) {
+        ProductProperty productProperty = productPropertyRepo.findById(request.getProdPropId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Неверный id набора свойств"));
+
+        Property property = propertyRepo.findById(request.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Свойства не существует"));
+
+        property.setName(request.getName());
+        property.setValue(request.getValue());
+        property.setProductProperty(productProperty);
+        propertyRepo.save(property);
     }
 
     @Transactional
