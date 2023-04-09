@@ -1,4 +1,8 @@
 # phoneShop
+
+## Стек
+SpringBoot 2.7.5, PostgreSQL 15, Docker 20.10, Java 18, Gradle 7.5.1
+
 ## Перед запуском проекта:
 
 + git clone https://github.com/Vadsxd/phoneShop.git
