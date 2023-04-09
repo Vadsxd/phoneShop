@@ -31,8 +31,6 @@ SpringBoot 2.7.5, PostgreSQL 15, Docker 20.10, Java 18, Gradle 7.5.1
 ## Docker
 Для Docker Compose можно использовать конфигурацию с помощью `.env` файла.
 
-См. пример `.env`
-
 Запустить контейнер:
 + docker-compose up -d
 
