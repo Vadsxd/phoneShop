@@ -1,5 +1,7 @@
 package com.shop.phoneshop.controllers;
 
+import com.shop.phoneshop.domain.Category;
+import com.shop.phoneshop.domain.Subcategory;
 import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.ProductDto;
 import com.shop.phoneshop.requests.FeedbackRequest;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Api(tags = "Каталог")
 @RestController
@@ -76,5 +79,17 @@ public class CatalogController {
     public ResponseEntity<CatalogDto> getPortableSpeakers(JwtAuthentication authentication,
                                                           @PathVariable Long id) {
         return ResponseEntity.ok(catalogService.getAllProductsFromSubcategory(id, authentication));
+    }
+
+    @ApiOperation("Получить все категории товаров")
+    @GetMapping("/catalog/categories")
+    public ResponseEntity<List<Category>> getAllCategories() {
+        return ResponseEntity.ok(catalogService.getAllCategories());
+    }
+
+    @ApiOperation("Получить все подкатегории товаров")
+    @GetMapping("/catalog/subcategories")
+    public ResponseEntity<List<Subcategory>> getAllSubcategories() {
+        return ResponseEntity.ok(catalogService.getAllSubcategories());
     }
 }

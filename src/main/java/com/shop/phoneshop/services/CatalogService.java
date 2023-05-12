@@ -189,4 +189,12 @@ public class CatalogService {
 
         return getCatalogDto(authentication, products);
     }
+
+    public List<Category> getAllCategories() {
+        return categoryRepo.findAll();
+    }
+
+    public List<Subcategory> getAllSubcategories() {
+        return subcategoryRepo.findAll();
+    }
 }
