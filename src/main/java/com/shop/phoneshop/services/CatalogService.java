@@ -1,14 +1,8 @@
 package com.shop.phoneshop.services;
 
 import com.shop.phoneshop.domain.*;
-import com.shop.phoneshop.dto.CatalogDto;
-import com.shop.phoneshop.dto.ProductDto;
-import com.shop.phoneshop.dto.UserFeedbackDto;
-import com.shop.phoneshop.dto.UserProductDto;
-import com.shop.phoneshop.mappers.CatalogMapper;
-import com.shop.phoneshop.mappers.ProductMapper;
-import com.shop.phoneshop.mappers.UserFeedbackMapper;
-import com.shop.phoneshop.mappers.UserProductMapper;
+import com.shop.phoneshop.dto.*;
+import com.shop.phoneshop.mappers.*;
 import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
@@ -190,11 +184,13 @@ public class CatalogService {
         return getCatalogDto(authentication, products);
     }
 
-    public List<Category> getAllCategories() {
-        return categoryRepo.findAll();
+    public List<CategoryDto> getAllCategories() {
+        List<Category> categories = categoryRepo.findAll();
+        return CategoryMapper.fromCategoriesToCategoriesDtos(categories);
     }
 
-    public List<Subcategory> getAllSubcategories() {
-        return subcategoryRepo.findAll();
+    public List<SubcategoryDto> getAllSubcategories() {
+        List<Subcategory> subcategories = subcategoryRepo.findAll();
+        return SubcategoryMapper.fromSubcategoriesToSubcategoriesDtos(subcategories);
     }
 }

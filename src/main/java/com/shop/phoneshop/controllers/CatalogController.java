@@ -1,9 +1,9 @@
 package com.shop.phoneshop.controllers;
 
-import com.shop.phoneshop.domain.Category;
-import com.shop.phoneshop.domain.Subcategory;
 import com.shop.phoneshop.dto.CatalogDto;
+import com.shop.phoneshop.dto.CategoryDto;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.dto.SubcategoryDto;
 import com.shop.phoneshop.requests.FeedbackRequest;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.services.CatalogService;
@@ -83,13 +83,13 @@ public class CatalogController {
 
     @ApiOperation("Получить все категории товаров")
     @GetMapping("/catalog/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {
         return ResponseEntity.ok(catalogService.getAllCategories());
     }
 
     @ApiOperation("Получить все подкатегории товаров")
     @GetMapping("/catalog/subcategories")
-    public ResponseEntity<List<Subcategory>> getAllSubcategories() {
+    public ResponseEntity<List<SubcategoryDto>> getAllSubcategories() {
         return ResponseEntity.ok(catalogService.getAllSubcategories());
     }
 }
