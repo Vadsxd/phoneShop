@@ -45,6 +45,7 @@ dependencies {
 
     // Swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

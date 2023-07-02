@@ -21,8 +21,8 @@ public interface SubcategoryMapper {
 
     static SubcategoryDto fromSubcategoryToSubcategoryDto(Subcategory subcategory) {
         SubcategoryDto subcategoryDto = new SubcategoryDto();
-        subcategoryDto.setId(subcategoryDto.getId());
-        subcategoryDto.setTitle(subcategoryDto.getTitle());
+        subcategoryDto.setId(subcategory.getId());
+        subcategoryDto.setTitle(subcategory.getTitle());
         subcategoryDto.setChildSubcategoriesDtos(SubcategoryMapper.fromSubcategoriesToSubcategoriesDtos(
                 subcategory.getChildSubcategories()));
 

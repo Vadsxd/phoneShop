@@ -1,6 +1,7 @@
 package com.shop.phoneshop.mappers;
 
 import com.shop.phoneshop.domain.Category;
+import com.shop.phoneshop.dto.CatalogDto;
 import com.shop.phoneshop.dto.CategoryDto;
 import com.shop.phoneshop.requests.admin.CategoryRequest;
 
@@ -18,8 +19,8 @@ public interface CategoryMapper {
 
     static CategoryDto fromCategoryToCategoryDto(Category category) {
         CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(categoryDto.getId());
-        categoryDto.setTitle(categoryDto.getTitle());
+        categoryDto.setId(category.getId());
+        categoryDto.setTitle(category.getTitle());
         categoryDto.setSubcategoryDtos(SubcategoryMapper.fromSubcategoriesToSubcategoriesDtos(
                 category.getSubcategories()));
 
