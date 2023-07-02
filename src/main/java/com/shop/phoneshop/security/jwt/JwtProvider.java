@@ -42,6 +42,8 @@ public class JwtProvider {
                 .setExpiration(Date.from(expiration))
                 .signWith(jwtAccessSecret)
                 .claim("roles", user.getRoles())
+                .claim("username", user.getFirstName())
+                .claim("usersurname", user.getLastName())
                 .compact();
         return new TokenResponse(token, expiration);
     }
