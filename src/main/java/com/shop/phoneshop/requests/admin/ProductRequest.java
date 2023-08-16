@@ -56,6 +56,6 @@ public class ProductRequest {
     private Boolean discount;
 
     @NotNull
-    @ApiModelProperty(value = "Свойства товара", required = true)
-    private @Valid ProductPropertyRequest productPropertyRequest;
+    @ApiModelProperty(value = "ID набора свойств товара", required = true)
+    private Long productPropertyId;
 }

@@ -92,6 +92,7 @@ public class CatalogService {
             for (String value : values) {
                 UserProductDto dto = new UserProductDto();
                 JSONObject json = new JSONObject(URLDecoder.decode(value, StandardCharsets.UTF_8));
+                dto.setProductId(((Number) json.get("productId")).longValue());
                 dto.setPictureUrl((String) json.get("pictureUrl"));
                 dto.setTitle((String) json.get("title"));
                 dto.setPrice(((Number) json.get("price")).longValue());

@@ -3,7 +3,6 @@ package com.shop.phoneshop.services;
 import com.shop.phoneshop.domain.*;
 import com.shop.phoneshop.mappers.CategoryMapper;
 import com.shop.phoneshop.mappers.ProductMapper;
-import com.shop.phoneshop.mappers.ProductPropertyMapper;
 import com.shop.phoneshop.mappers.SubcategoryMapper;
 import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.requests.DeleteFeedbackRequest;
@@ -140,10 +139,8 @@ public class AdminService {
         Subcategory subcategory = subcategoryRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
-        ProductPropertyRequest productPropertyRequest = request.getProductPropertyRequest();
-        List<Property> properties = propertyRepo.findAllById(productPropertyRequest.getPropertyIds());
-        ProductProperty productProperty = ProductPropertyMapper.fromProductPropertyRequestToProductProperty(productPropertyRequest, properties);
-        productPropertyRepo.save(productProperty);
+        ProductProperty productProperty = productPropertyRepo.findById(request.getProductPropertyId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данного набора свойств не существует"));
 
         Product product = ProductMapper.fromProductRequestToProduct(request, productProperty, subcategory);
         productRepo.save(product);
@@ -159,10 +156,8 @@ public class AdminService {
         Subcategory subcategory = subcategoryRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
-        ProductPropertyRequest productPropertyRequest = request.getProductPropertyRequest();
-        List<Property> properties = propertyRepo.findAllById(productPropertyRequest.getPropertyIds());
-        ProductProperty productProperty = ProductPropertyMapper.fromProductPropertyRequestToProductProperty(productPropertyRequest, properties);
-        productPropertyRepo.save(productProperty);
+        ProductProperty productProperty = productPropertyRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Данного набора свойств не существует"));
 
         product.setPictureUrl(request.getPictureUrl());
         product.setSubcategory(subcategory);

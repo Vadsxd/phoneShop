@@ -16,6 +16,8 @@ public interface ProductMapper {
                                        List<UserFeedbackDto> userFeedbackDtos) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
+        productDto.setCategoryId(product.getSubcategory().getCategory().getId());
+        productDto.setSubcategoryId(product.getSubcategory().getId());
         productDto.setPictureUrl(product.getPictureUrl());
         productDto.setTitle(product.getTitle());
         productDto.setDescription(product.getDescription());

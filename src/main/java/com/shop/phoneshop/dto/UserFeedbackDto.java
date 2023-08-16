@@ -12,6 +12,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserFeedbackDto {
+    @ApiModelProperty(notes = "Имя пользователя", required = true)
+    private String firstName;
+
+    @ApiModelProperty(notes = "Фамилия пользователя", required = true)
+    private String lastName;
+
     @ApiModelProperty(notes = "Ссылки на картинки для отзыва", required = true)
     private List<String> picturesUrls;
 
