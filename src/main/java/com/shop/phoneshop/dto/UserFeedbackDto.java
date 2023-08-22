@@ -12,6 +12,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserFeedbackDto {
+    @ApiModelProperty(notes = "ID отзыва", required = true)
+    private Long userFeedbackId;
+
     @ApiModelProperty(notes = "Имя пользователя", required = true)
     private String firstName;
 

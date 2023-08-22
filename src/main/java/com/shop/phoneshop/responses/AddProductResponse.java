@@ -1,7 +1,8 @@
-package com.shop.phoneshop.dto;
+package com.shop.phoneshop.responses;
 
-import com.shop.phoneshop.domain.enums.ProductStatus;
+import com.shop.phoneshop.dto.PropertyDto;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductDto {
+@AllArgsConstructor
+public class AddProductResponse {
     @ApiModelProperty(notes = "ID продукта", required = true)
     private Long id;
 
@@ -30,15 +32,14 @@ public class ProductDto {
     @ApiModelProperty(notes = "Описание товара", required = true)
     private String description;
 
-    @ApiModelProperty(notes = "Статус товара (AVAILABLE - большое количество, LOW - мало, EMPTY - товар отсутствует)",
-            required = true)
-    private ProductStatus status;
+    @ApiModelProperty(notes = "Количество товара", required = true)
+    private Long amount;
 
     @ApiModelProperty(notes = "Цена на товар", required = true)
     private Long price;
 
-    @ApiModelProperty(notes = "Отзывы товара", required = true)
-    private List<UserFeedbackDto> userFeedbackDtos;
+    @ApiModelProperty(notes = "Цена на товар с учетом скидки", required = true)
+    private Long discountPrice;
 
     @ApiModelProperty(notes = "Свойства товара", required = true)
     private List<PropertyDto> properties;

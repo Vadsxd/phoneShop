@@ -1,12 +1,15 @@
 package com.shop.phoneshop.services;
 
 import com.shop.phoneshop.domain.*;
+import com.shop.phoneshop.dto.PropertyDto;
 import com.shop.phoneshop.mappers.CategoryMapper;
 import com.shop.phoneshop.mappers.ProductMapper;
+import com.shop.phoneshop.mappers.PropertyMapper;
 import com.shop.phoneshop.mappers.SubcategoryMapper;
 import com.shop.phoneshop.repos.*;
 import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.admin.*;
+import com.shop.phoneshop.responses.AddProductResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -135,7 +138,7 @@ public class AdminService {
     }
 
     @Transactional
-    public Product addProduct(ProductRequest request) {
+    public AddProductResponse addProduct(ProductRequest request) {
         Subcategory subcategory = subcategoryRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
@@ -145,7 +148,9 @@ public class AdminService {
         Product product = ProductMapper.fromProductRequestToProduct(request, productProperty, subcategory);
         productRepo.save(product);
 
-        return product;
+        List<PropertyDto> propertyDtos = PropertyMapper.fromPropertiesToDtos(product.getProductProperty().getProperties());
+
+        return ProductMapper.fromProductToAddProductResponse(product, propertyDtos);
     }
 
     @Transactional
@@ -156,7 +161,7 @@ public class AdminService {
         Subcategory subcategory = subcategoryRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данной подкатегории не существует"));
 
-        ProductProperty productProperty = productPropertyRepo.findById(request.getSubcategoryId()).orElseThrow(() ->
+        ProductProperty productProperty = productPropertyRepo.findById(request.getProductPropertyId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Данного набора свойств не существует"));
 
         product.setPictureUrl(request.getPictureUrl());

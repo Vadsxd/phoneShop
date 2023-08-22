@@ -4,8 +4,10 @@ import com.shop.phoneshop.domain.Product;
 import com.shop.phoneshop.domain.ProductProperty;
 import com.shop.phoneshop.domain.Subcategory;
 import com.shop.phoneshop.dto.ProductDto;
+import com.shop.phoneshop.dto.PropertyDto;
 import com.shop.phoneshop.dto.UserFeedbackDto;
 import com.shop.phoneshop.requests.admin.ProductRequest;
+import com.shop.phoneshop.responses.AddProductResponse;
 import com.shop.phoneshop.security.jwt.JwtAuthentication;
 import com.shop.phoneshop.utils.ProductUtil;
 
@@ -13,7 +15,8 @@ import java.util.List;
 
 public interface ProductMapper {
     static ProductDto fromProductToDto(Product product, JwtAuthentication authentication,
-                                       List<UserFeedbackDto> userFeedbackDtos) {
+                                       List<UserFeedbackDto> userFeedbackDtos,
+                                       List<PropertyDto> propertyDtos) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
         productDto.setCategoryId(product.getSubcategory().getCategory().getId());
@@ -24,6 +27,7 @@ public interface ProductMapper {
         productDto.setStatus(ProductUtil.getStatus(product));
         productDto.setPrice(ProductUtil.getPrice(product, authentication));
         productDto.setUserFeedbackDtos(userFeedbackDtos);
+        productDto.setProperties(propertyDtos);
 
         return productDto;
     }
@@ -49,5 +53,20 @@ public interface ProductMapper {
         product.setDiscount(request.getDiscount());
 
         return product;
+    }
+
+    static AddProductResponse fromProductToAddProductResponse(Product product, List<PropertyDto> propertyDtos) {
+        return new AddProductResponse(
+                product.getId(),
+                product.getSubcategory().getCategory().getId(),
+                product.getSubcategory().getId(),
+                product.getPictureUrl(),
+                product.getTitle(),
+                product.getDescription(),
+                product.getAmount(),
+                product.getPrice(),
+                product.getDiscountPrice(),
+                propertyDtos
+        );
     }
 }

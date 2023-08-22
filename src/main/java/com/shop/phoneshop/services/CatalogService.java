@@ -64,7 +64,9 @@ public class CatalogService {
                 .map(product -> {
                     List<UserFeedback> userFeedbacks = product.getUserFeedbacks();
                     List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
-                    return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+                    List<PropertyDto> propertyDtos = PropertyMapper.fromPropertiesToDtos(product.getProductProperty().getProperties());
+
+                    return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos, propertyDtos);
                 })
                 .collect(Collectors.toList());
 
@@ -109,8 +111,9 @@ public class CatalogService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден"));
         List<UserFeedback> userFeedbacks = product.getUserFeedbacks();
         List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
+        List<PropertyDto> propertyDtos = PropertyMapper.fromPropertiesToDtos(product.getProductProperty().getProperties());
 
-        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos, propertyDtos);
     }
 
     public ProductDto getProductFeedbacksSortedAscending(Long id, JwtAuthentication authentication) {
@@ -120,8 +123,9 @@ public class CatalogService {
                 .sorted(Comparator.comparingLong(UserFeedback::getFeedback))
                 .toList();
         List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
+        List<PropertyDto> propertyDtos = PropertyMapper.fromPropertiesToDtos(product.getProductProperty().getProperties());
 
-        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos, propertyDtos);
     }
 
     public ProductDto getProductFeedbacksSortedDescending(Long id, JwtAuthentication authentication) {
@@ -131,8 +135,9 @@ public class CatalogService {
                 .sorted(Comparator.comparingLong(UserFeedback::getFeedback).reversed())
                 .toList();
         List<UserFeedbackDto> userFeedbackDtos = UserFeedbackMapper.fromUserFeedbacksToDtos(userFeedbacks);
+        List<PropertyDto> propertyDtos = PropertyMapper.fromPropertiesToDtos(product.getProductProperty().getProperties());
 
-        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos);
+        return ProductMapper.fromProductToDto(product, authentication, userFeedbackDtos, propertyDtos);
     }
 
     @Transactional

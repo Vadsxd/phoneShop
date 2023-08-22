@@ -1,11 +1,11 @@
 package com.shop.phoneshop.controllers;
 
 import com.shop.phoneshop.domain.Category;
-import com.shop.phoneshop.domain.Product;
 import com.shop.phoneshop.domain.Property;
 import com.shop.phoneshop.domain.Subcategory;
 import com.shop.phoneshop.requests.DeleteFeedbackRequest;
 import com.shop.phoneshop.requests.admin.*;
+import com.shop.phoneshop.responses.AddProductResponse;
 import com.shop.phoneshop.services.AdminService;
 import com.shop.phoneshop.utils.validation.Marker;
 import io.swagger.annotations.Api;
@@ -102,7 +102,7 @@ public class AdminController {
     @ApiResponses(@ApiResponse(code = 404, message = "Подкатегории не существует"))
     @Validated(Marker.onCreate.class)
     @PostMapping("/product")
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductRequest request) {
+    public ResponseEntity<AddProductResponse> addProduct(@Valid @RequestBody ProductRequest request) {
         return ResponseEntity.ok(adminService.addProduct(request));
     }
 
